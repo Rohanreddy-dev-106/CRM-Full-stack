@@ -1,0 +1,81 @@
+// lib/api.ts — Central API client for the Express backend
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:6060";
+
+// ─── Stage Mapping ───────────────────────────────────────────────
+// Frontend uses UPPERCASE_SNAKE: "COLD", "DEMO_BOOKED", "PILOT_CLOSED"
+// Backend  uses Title Case:      "Cold", "Demo Booked", "Pilot Closed"
+
+const STAGE_TO_BACKEND: Record<string, string> = {
+  COLD:          "Cold",
+  CONTACTED:     "Contacted",
+  DEMO_BOOKED:   "Demo Booked",
+  DEMO_DONE:     "Demo Done",
+  PROPOSAL_SENT: "Proposal Sent",
+  PILOT_CLOSED:  "Pilot Closed",
+};
+
+const STAGE_TO_FRONTEND: Record<string, string> = {
+  "Cold":          "COLD",
+  "Contacted":     "CONTACTED",
+  "Demo Booked":   "DEMO_BOOKED",
+  "Demo Done":     "DEMO_DONE",
+  "Proposal Sent": "PROPOSAL_SENT",
+  "Pilot Closed":  "PILOT_CLOSED",
+};
+
+export function toBackendStage(frontendStage: string): string {
+  return STAGE_TO_BACKEND[frontendStage] || frontendStage;
+}
+
+export function toFrontendStage(backendStage: string): string {
+  return STAGE_TO_FRONTEND[backendStage] || backendStage;
+}
+
+// ─── Generic Fetch Helper ────────────────────────────────────────
+
+interface FetchOptions extends RequestInit {
+  token?: string;
+}
+
+export async function backendFetch(path: string, options: FetchOptions = {}) {
+  const { token, headers: extraHeaders, ...rest } = options;
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...(extraHeaders as Record<string, string>),
+  };
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const res = await fetch(`${BACKEND_URL}${path}`, {
+    ...rest,
+    headers,
+    credentials: "include",
+  });
+
+  return res;
+}
+
+// ─── Map a single backend card → frontend Prospect shape ─────────
+
+export function mapCardToProspect(card: any) {
+  return {
+    id:               card.id || card._id,
+    name:             card.name,
+    school:           card.school,
+    role:             card.role || "",
+    email:            card.email || "",
+    phone:            card.phone || "",
+    source:           card.source || "Direct",
+    stage:            toFrontendStage(card.stage),
+    lastContactDate:  card.lastContactDate || null,
+    nextFollowUpDate: card.nextFollowUpDate || null,
+    createdAt:        card.createdAt,
+    updatedAt:        card.updatedAt || card.createdAt,
+    notes:            [],
+    checklistItems:   [],
+  };
+}
