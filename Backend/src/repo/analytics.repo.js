@@ -1,44 +1,34 @@
-import Card from "../models/card.schema.js";
+import prisma from "../db/prismaClient.js";
 
 export default class AnalyticsRepository {
     
     async getStageBreakdown() {
-        const now = new Date();
+        const rows = await prisma.$queryRaw`
+            SELECT
+                stage AS stage,
+                COUNT(*) AS count,
+                ROUND(AVG(TIMESTAMPDIFF(DAY, createdAt, NOW())), 1) AS avgDays
+            FROM Prospect
+            GROUP BY stage
+            ORDER BY FIELD(stage, 'Cold', 'Contacted', 'Demo Booked', 'Demo Done', 'Proposal Sent', 'Pilot Closed')
+        `;
 
-        return Card.aggregate([
-            {
-                $group: {
-                    _id: "$stage",
-                    count: { $sum: 1 },
-                    avgDaysInStage: {
-                        $avg: {
-                            $divide: [
-                                { $subtract: [now, "$createdAt"] },
-                                1000 * 60 * 60 * 24 // ms → days
-                            ]
-                        }
-                    }
-                }
-            },
-            {
-                $project: {
-                    stage: "$_id",
-                    count: 1,
-                    avgDays: { $round: ["$avgDaysInStage", 1] },
-                    _id: 0
-                }
-            },
-            { $sort: { stage: 1 } }
-        ]);
+        return rows.map((row) => ({
+            stage: row.stage,
+            count: Number(row.count ?? 0),
+            avgDays: Number(row.avgDays ?? 0)
+        }));
     }
 
     /**
      * Count of prospects with overdue follow-ups
      */
     async getOverdueCount() {
-        return Card.countDocuments({
-            nextFollowUpDate: { $lt: new Date() },
-            stage: { $ne: "Pilot Closed" }
+        return prisma.prospect.count({
+            where: {
+                nextFollowUpDate: { lt: new Date() },
+                stage: { not: "Pilot Closed" }
+            }
         });
     }
 
@@ -49,9 +39,11 @@ export default class AnalyticsRepository {
         const now = new Date();
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-        return Card.countDocuments({
-            stage: "Pilot Closed",
-            updatedAt: { $gte: startOfMonth }
+        return prisma.prospect.count({
+            where: {
+                stage: "Pilot Closed",
+                updatedAt: { gte: startOfMonth }
+            }
         });
     }
 
@@ -62,27 +54,22 @@ export default class AnalyticsRepository {
         const sixMonthsAgo = new Date();
         sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
-        return Card.aggregate([
-            { $match: { createdAt: { $gte: sixMonthsAgo } } },
-            {
-                $group: {
-                    _id: {
-                        year: { $year: "$createdAt" },
-                        month: { $month: "$createdAt" }
-                    },
-                    count: { $sum: 1 }
-                }
-            },
-            {
-                $project: {
-                    year: "$_id.year",
-                    month: "$_id.month",
-                    count: 1,
-                    _id: 0
-                }
-            },
-            { $sort: { year: 1, month: 1 } }
-        ]);
+        const rows = await prisma.$queryRaw`
+            SELECT
+                YEAR(createdAt) AS year,
+                MONTH(createdAt) AS month,
+                COUNT(*) AS count
+            FROM Prospect
+            WHERE createdAt >= ${sixMonthsAgo}
+            GROUP BY YEAR(createdAt), MONTH(createdAt)
+            ORDER BY YEAR(createdAt), MONTH(createdAt)
+        `;
+
+        return rows.map((row) => ({
+            year: Number(row.year),
+            month: Number(row.month),
+            count: Number(row.count ?? 0)
+        }));
     }
 
     /**
@@ -95,8 +82,8 @@ export default class AnalyticsRepository {
                 this.getOverdueCount(),
                 this.getClosedThisMonth(),
                 this.getMonthlyTrend(),
-                Card.countDocuments(),
-                Card.countDocuments({ stage: "Pilot Closed" })
+                prisma.prospect.count(),
+                prisma.prospect.count({ where: { stage: "Pilot Closed" } })
             ]);
 
         const conversionRate = totalProspects > 0

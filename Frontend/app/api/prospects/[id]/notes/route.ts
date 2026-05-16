@@ -1,41 +1,36 @@
-// app/api/prospects/[id]/notes/route.ts — Proxies to Express backend
+// app/api/prospects/[id]/notes/route.ts — Prisma-backed notes endpoint
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { backendFetch } from "@/lib/api";
+import prisma from "@/lib/prisma";
 
 export async function POST(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const cookieStore = cookies();
-    const token = cookieStore.get("token")?.value;
-
     const { content } = await req.json();
     if (!content?.trim()) {
       return NextResponse.json({ error: "Content required" }, { status: 400 });
     }
 
-    const res = await backendFetch(`/api/cards/${params.id}/notes`, {
-      method: "POST",
-      body: JSON.stringify({ content: content.trim() }),
-      token,
+    const prospect = await prisma.prospect.findUnique({
+      where: { id: params.id },
+      select: { id: true },
     });
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      return NextResponse.json(
-        { error: err.message || "Failed to add note" },
-        { status: res.status }
-      );
+    if (!prospect) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    const json = await res.json();
-    const note = json.data || json;
+    const note = await prisma.prospectNote.create({
+      data: {
+        prospectId: params.id,
+        content: content.trim(),
+      },
+    });
 
     return NextResponse.json(
       {
-        id: note._id || note.id,
+        id: note.id,
         prospectId: note.prospectId,
         content: note.content,
         createdAt: note.createdAt,

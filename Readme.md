@@ -978,6 +978,93 @@ The analytics endpoint (`GET /api/analytics`) computes all stats in a single rou
 
 ---
 
+## Migration to MySQL + Prisma
+
+This repository now supports an optional migration path from the original MongoDB/Mongoose backend to a MySQL database managed with Prisma. The migration was implemented to preserve the existing API shapes so the frontend remains compatible.
+
+Key changes
+- Backend: Prisma client added with the MariaDB adapter (`@prisma/adapter-mariadb`) and `mariadb` driver.
+- New Prisma schema: `prisma/schema.prisma` (models: `Prospect`, `ProspectNote`, `OnboardingChecklist`, `User`).
+- Seed script: `Backend/prisma/seed.js` to populate demo data and create idempotent onboarding checklists.
+- Repo/service layer: `Backend/src/repo/*` and `Backend/src/service/*` updated to use Prisma while keeping API response shapes unchanged.
+- Frontend: some Next.js API routes may call the Prisma client directly (via a lightweight bridge) so the app can run without an external MongoDB if desired.
+- MongoDB/Mongoose artifacts remain in the repo for rollback and verification.
+
+Environment
+- Backend accepts the original `MONGODB_CONNECTION_STRING` (to keep using MongoDB) or a `DATABASE_URL` for Prisma/MySQL.
+- Example `Backend/src/.env` additions:
+
+```env
+# Use this for Prisma / MySQL (example):
+DATABASE_URL=mysql://user:password@localhost:3306/kalnet_crm
+
+# Existing Mongo variable (kept for backward compatibility):
+MONGODB_CONNECTION_STRING=mongodb://localhost:27017/kalnet-crm
+```
+
+Scripts & common commands (run from `Backend/`)
+
+```bash
+# Install deps
+npm install
+
+# Generate Prisma client
+npx prisma generate
+
+# Create migrations (requires DATABASE_URL pointing at MySQL/MariaDB)
+npx prisma migrate dev --name init
+
+# Run seed script (idempotent)
+npm run db:seed
+```
+
+Notes
+- Prisma v7 requires a runtime adapter for MySQL/MariaDB; this project uses `@prisma/adapter-mariadb` + `mariadb` driver. The Prisma client is exported from `Backend/src/db/prismaClient.js`.
+- To test locally: set `DATABASE_URL` to a reachable MySQL instance, run `npx prisma generate`, `npx prisma migrate dev --name init`, then `npm run db:seed`.
+- API response shapes were preserved to avoid frontend changes. Mongo artifacts were intentionally kept for rollback; remove them only after full verification.
+
+### Troubleshooting — Prisma migrations & common issues
+
+If you run into problems while switching to the Prisma/MySQL path, the following checklist covers the most common errors and how to resolve them.
+
+- `P1001` / "Can't reach database": Ensure MySQL/MariaDB is running and `DATABASE_URL` is correct. Verify connectivity:
+
+```bash
+# macOS / Linux
+mysql --host=localhost --user=<user> -p
+
+# Windows PowerShell
+Test-NetConnection -ComputerName localhost -Port 3306
+```
+
+- `P1012` / schema `url` is no longer supported: Prisma v7 moved the `url` out of `schema.prisma`. Remove `url` from the schema and configure the connection via `DATABASE_URL` + adapter as shown in the project.
+
+- Adapter not found or runtime errors: Install the runtime adapter and driver used here:
+
+```bash
+cd Backend
+npm install @prisma/adapter-mariadb mariadb
+```
+
+- `npx prisma generate` fails: confirm `prisma` is installed in `node_modules` and `DATABASE_URL` (if required) is set. Run `npx prisma validate` then `npx prisma generate`.
+
+- `npx prisma migrate dev` errors: Check that the DB user has permission to create schemas/tables, and that the target database exists or use `--create-database` where supported. Review the full error for SQL-level hints.
+
+- Seed script issues (ts-node/esm loader errors): Use the provided plain ESM seed runner `Backend/prisma/seed.js` (avoids ts-node/esm loader problems on newer Node versions):
+
+```bash
+cd Backend
+npm run db:seed
+```
+
+- Next.js build or server bundling errors importing Prisma: Avoid importing Prisma client from modules that are bundled for both client and server. The project uses a lightweight bridge and a singleton pattern (`Backend/src/db/prismaClient.js` and `Frontend/lib/prisma.ts`) to prevent multiple instances and bundling problems.
+
+- Duplicate checklist items after repeated seeds: The code uses idempotent inserts (`createMany` with `skipDuplicates`) to avoid duplicate checklist items — if you still see duplicates, confirm the unique constraint on `(prospectId, stepNumber)` exists in the database.
+
+- Firewall / bind-address issues: If the DB is running but unreachable, check MySQL's `bind-address` (set to `0.0.0.0` to allow external connections) and any OS-level firewall rules.
+
+If you hit an error not covered above, paste the exact error message and I will provide targeted troubleshooting steps.
+
 ## 18. Production Deployment
 
 ### Backend (e.g., Railway, Render, EC2)

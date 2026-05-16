@@ -1,68 +1,55 @@
-// app/api/prospects/[id]/route.ts — Proxies to Express backend
+// app/api/prospects/[id]/route.ts — Prisma-backed single prospect endpoint
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { backendFetch, mapCardToProspect, toBackendStage, toFrontendStage } from "@/lib/api";
+import prisma from "@/lib/prisma";
+import { createOnboardingChecklist } from "../../../../../Backend/src/utils/onbord.chicklist.js";
+import { mapCardToProspect, toBackendStage, toFrontendStage } from "@/lib/api";
+
+function mapNote(note: any) {
+  return {
+    id: note.id,
+    prospectId: note.prospectId,
+    content: note.content,
+    createdAt: note.createdAt,
+  };
+}
+
+function mapChecklistItem(item: any) {
+  return {
+    id: item.id,
+    prospectId: item.prospectId,
+    stepNumber: item.stepNumber,
+    title: item.title,
+    description: item.description || "",
+    assignee: item.assignee || "",
+    status: item.status === "done" ? "DONE" : "TODO",
+    dueDate: item.dueDate || null,
+    createdAt: item.createdAt,
+    updatedAt: item.updatedAt || item.createdAt,
+  };
+}
 
 export async function GET(
   _req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const cookieStore = cookies();
-    const token = cookieStore.get("token")?.value;
+    const prospect = await prisma.prospect.findUnique({
+      where: { id: params.id },
+      include: {
+        notes: { orderBy: { createdAt: "desc" } },
+        checklistItems: { orderBy: { stepNumber: "asc" } },
+      },
+    });
 
-    const res = await backendFetch(`/api/cards/${params.id}`, { token });
-    if (!res.ok) {
-      return NextResponse.json({ error: "Not found" }, { status: res.status });
+    if (!prospect) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    const json = await res.json();
-    const card = json.data || json;
-    const prospect = mapCardToProspect(card);
-
-    // Fetch notes
-    try {
-      const notesRes = await backendFetch(
-        `/api/cards/${params.id}/notes?page=1&limit=50`,
-        { token }
-      );
-      if (notesRes.ok) {
-        const notesJson = await notesRes.json();
-        prospect.notes = (notesJson.data || []).map((n: any) => ({
-          id: n._id || n.id,
-          prospectId: n.prospectId,
-          content: n.content,
-          createdAt: n.createdAt,
-        }));
-      }
-    } catch {}
-
-    // Fetch checklist if pilot closed
-    if (prospect.stage === "PILOT_CLOSED") {
-      try {
-        const clRes = await backendFetch(
-          `/api/cards/${params.id}/checklist?page=1&limit=50`,
-          { token }
-        );
-        if (clRes.ok) {
-          const clJson = await clRes.json();
-          prospect.checklistItems = (clJson.data || []).map((item: any) => ({
-            id: item._id || item.id,
-            prospectId: item.prospectId,
-            stepNumber: item.stepNumber,
-            title: item.title,
-            description: item.description || "",
-            assignee: item.assignee || "",
-            status: item.status === "done" ? "DONE" : "TODO",
-            dueDate: item.dueDate || null,
-            createdAt: item.createdAt,
-            updatedAt: item.updatedAt || item.createdAt,
-          }));
-        }
-      } catch {}
-    }
-
-    return NextResponse.json(prospect);
+    return NextResponse.json({
+      ...mapCardToProspect({ ...prospect, stage: toFrontendStage(prospect.stage) }),
+      notes: (prospect.notes || []).map(mapNote),
+      checklistItems: (prospect.checklistItems || []).map(mapChecklistItem),
+    });
   } catch {
     return NextResponse.json({ error: "Failed to fetch" }, { status: 500 });
   }
@@ -73,83 +60,58 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    const cookieStore = cookies();
-    const token = cookieStore.get("token")?.value;
     const body = await req.json();
 
-    // Map stage to backend format
-    const backendBody: any = { ...body };
-    if (body.stage) {
-      backendBody.stage = toBackendStage(body.stage);
-    }
-    // Remove frontend-only fields
-    delete backendBody.id;
-    delete backendBody.notes;
-    delete backendBody.checklistItems;
-    delete backendBody.createdAt;
-    delete backendBody.updatedAt;
-
-    const res = await backendFetch(`/api/cards/${params.id}`, {
-      method: "PATCH",
-      body: JSON.stringify(backendBody),
-      token,
+    const existing = await prisma.prospect.findUnique({
+      where: { id: params.id },
+      select: { stage: true },
     });
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      return NextResponse.json(
-        { error: err.message || "Failed to update prospect" },
-        { status: res.status }
-      );
+    if (!existing) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    const json = await res.json();
-    const updated = json.data || json;
-    const prospect = mapCardToProspect(updated);
+    const data: Record<string, any> = {
+      name: body.name,
+      school: body.school,
+      role: body.role ?? undefined,
+      email: body.email ?? undefined,
+      phone: body.phone ?? undefined,
+      source: body.source ?? undefined,
+      lastContactDate: body.lastContactDate ? new Date(body.lastContactDate) : undefined,
+      nextFollowUpDate: body.nextFollowUpDate ? new Date(body.nextFollowUpDate) : undefined,
+    };
 
-    // Fetch notes for updated prospect
-    try {
-      const notesRes = await backendFetch(
-        `/api/cards/${params.id}/notes?page=1&limit=50`,
-        { token }
-      );
-      if (notesRes.ok) {
-        const notesJson = await notesRes.json();
-        prospect.notes = (notesJson.data || []).map((n: any) => ({
-          id: n._id || n.id,
-          prospectId: n.prospectId,
-          content: n.content,
-          createdAt: n.createdAt,
-        }));
-      }
-    } catch {}
-
-    // Fetch checklist if now pilot closed
-    if (prospect.stage === "PILOT_CLOSED") {
-      try {
-        const clRes = await backendFetch(
-          `/api/cards/${params.id}/checklist?page=1&limit=50`,
-          { token }
-        );
-        if (clRes.ok) {
-          const clJson = await clRes.json();
-          prospect.checklistItems = (clJson.data || []).map((item: any) => ({
-            id: item._id || item.id,
-            prospectId: item.prospectId,
-            stepNumber: item.stepNumber,
-            title: item.title,
-            description: item.description || "",
-            assignee: item.assignee || "",
-            status: item.status === "done" ? "DONE" : "TODO",
-            dueDate: item.dueDate || null,
-            createdAt: item.createdAt,
-            updatedAt: item.updatedAt || item.createdAt,
-          }));
-        }
-      } catch {}
+    if (body.stage) {
+      data.stage = toBackendStage(body.stage);
     }
 
-    return NextResponse.json(prospect);
+    for (const key of ["id", "notes", "checklistItems", "createdAt", "updatedAt"]) {
+      delete (data as any)[key];
+    }
+
+    const updated = await prisma.prospect.update({
+      where: { id: params.id },
+      data,
+    });
+
+    if (existing.stage !== "Pilot Closed" && updated.stage === "Pilot Closed") {
+      await createOnboardingChecklist(updated.id);
+    }
+
+    const prospect = await prisma.prospect.findUnique({
+      where: { id: params.id },
+      include: {
+        notes: { orderBy: { createdAt: "desc" } },
+        checklistItems: { orderBy: { stepNumber: "asc" } },
+      },
+    });
+
+    return NextResponse.json({
+      ...mapCardToProspect({ ...updated, stage: toFrontendStage(updated.stage) }),
+      notes: (prospect?.notes || []).map(mapNote),
+      checklistItems: (prospect?.checklistItems || []).map(mapChecklistItem),
+    });
   } catch (err) {
     console.error("PATCH /api/prospects/[id] error:", err);
     return NextResponse.json({ error: "Failed to update prospect" }, { status: 500 });
@@ -161,22 +123,16 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const cookieStore = cookies();
-    const token = cookieStore.get("token")?.value;
-
-    const res = await backendFetch(`/api/cards/${params.id}`, {
-      method: "DELETE",
-      token,
+    const existing = await prisma.prospect.findUnique({
+      where: { id: params.id },
+      select: { id: true },
     });
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      return NextResponse.json(
-        { error: err.message || "Failed to delete prospect" },
-        { status: res.status }
-      );
+    if (!existing) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
+    await prisma.prospect.delete({ where: { id: params.id } });
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("DELETE /api/prospects/[id] error:", err);

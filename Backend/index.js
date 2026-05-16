@@ -6,7 +6,7 @@ import rateLimit from "express-rate-limit";
 import MainRoutes from "./src/routers/main.routs.js";
 import AuthRoutes from "./src/routers/auth.routes.js";
 
-dotenv.config({ path: "./src/.env" });
+dotenv.config();
 
 const server = express();
 

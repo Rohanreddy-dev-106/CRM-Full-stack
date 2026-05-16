@@ -1,48 +1,37 @@
-// app/api/prospects/[id]/checklist/[checklistId]/route.ts — Proxies to Express backend
+// app/api/prospects/[id]/checklist/[checklistId]/route.ts — Prisma-backed checklist endpoint
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { backendFetch } from "@/lib/api";
+import prisma from "@/lib/prisma";
 
 export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string; checklistId: string } }
 ) {
   try {
-    const cookieStore = cookies();
-    const token = cookieStore.get("token")?.value;
-
     const { status } = await req.json();
-    // Frontend sends "TODO"/"DONE", backend expects "todo"/"done"
-    const backendStatus = status.toLowerCase();
-
-    const res = await backendFetch(`/api/checklist/${params.checklistId}`, {
-      method: "PATCH",
-      body: JSON.stringify({ status: backendStatus }),
-      token,
+    const item = await prisma.onboardingChecklist.findUnique({
+      where: { id: params.checklistId },
     });
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      return NextResponse.json(
-        { error: err.message || "Failed to update" },
-        { status: res.status }
-      );
+    if (!item || item.prospectId !== params.id) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    const json = await res.json();
-    const item = json.data || json;
+    const updated = await prisma.onboardingChecklist.update({
+      where: { id: params.checklistId },
+      data: { status: status.toLowerCase() },
+    });
 
     return NextResponse.json({
-      id: item._id || item.id,
-      prospectId: item.prospectId,
-      stepNumber: item.stepNumber,
-      title: item.title,
-      description: item.description || "",
-      assignee: item.assignee || "",
-      status: item.status === "done" ? "DONE" : "TODO",
-      dueDate: item.dueDate || null,
-      createdAt: item.createdAt,
-      updatedAt: item.updatedAt || item.createdAt,
+      id: updated.id,
+      prospectId: updated.prospectId,
+      stepNumber: updated.stepNumber,
+      title: updated.title,
+      description: updated.description || "",
+      assignee: updated.assignee || "",
+      status: updated.status === "done" ? "DONE" : "TODO",
+      dueDate: updated.dueDate || null,
+      createdAt: updated.createdAt,
+      updatedAt: updated.updatedAt || updated.createdAt,
     });
   } catch (err) {
     console.error("PATCH checklist error:", err);

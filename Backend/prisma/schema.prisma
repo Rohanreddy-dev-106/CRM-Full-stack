@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Prospect {
+  id               String                @id @default(cuid())
+  name             String
+  school           String
+  role             String?
+  email            String?
+  phone            String?
+  source           String                @default("Direct")
+  stage            String                @default("Cold")
+  lastContactDate  DateTime?
+  nextFollowUpDate DateTime?
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+
+  notes            ProspectNote[]
+  checklistItems   OnboardingChecklist[]
+
+  @@index([stage, createdAt])
+  @@index([nextFollowUpDate])
+}
+
+model ProspectNote {
+  id         String   @id @default(cuid())
+  prospect   Prospect @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  prospectId String
+  content    String
+  createdAt  DateTime @default(now())
+
+  @@index([prospectId, createdAt])
+}
+
+model OnboardingChecklist {
+  id          String   @id @default(cuid())
+  prospect    Prospect @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  prospectId  String
+  stepNumber  Int
+  title       String
+  description String?
+  assignee    String?
+  status      String   @default("todo")
+  dueDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([prospectId, stepNumber])
+  @@index([prospectId, status])
+}

@@ -1,4 +1,4 @@
-import Checklist from "../models/checklist.schema.js";
+import prisma from "../db/prismaClient.js";
 
 const CHECKLIST_STEPS = [
     "School KYC completed",
@@ -14,11 +14,6 @@ const CHECKLIST_STEPS = [
 ];
 
 export const createOnboardingChecklist = async (prospectId) => {
-    const existing = await Checklist.findOne({ prospectId });
-
-    // SAFETY CHECK
-    if (existing) return; // if exists
-
     const checklistDocs = CHECKLIST_STEPS.map((title, index) => ({
         prospectId,
         stepNumber: index + 1,
@@ -29,5 +24,8 @@ export const createOnboardingChecklist = async (prospectId) => {
         dueDate: new Date(Date.now() + (index + 1) * 86400000)
     }));
 
-    await Checklist.insertMany(checklistDocs); // insert all checklist at once
+    await prisma.onboardingChecklist.createMany({
+        data: checklistDocs,
+        skipDuplicates: true
+    });
 };

@@ -1,6 +1,6 @@
 // lib/api.ts — Central API client for the Express backend
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:6060";
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
 
 // ─── Stage Mapping ───────────────────────────────────────────────
 // Frontend uses UPPERCASE_SNAKE: "COLD", "DEMO_BOOKED", "PILOT_CLOSED"

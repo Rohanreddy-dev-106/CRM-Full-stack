@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-const objectIdSchema = z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid id format");
 const stageSchema = z.enum([
     "Cold",
     "Contacted",
@@ -16,11 +15,11 @@ export const paginationQuerySchema = z.object({
 });
 
 export const idParamSchema = z.object({
-    id: objectIdSchema
+    id: z.string().min(1, "Invalid id format")
 });
 
 export const cardIdParamSchema = z.object({
-    cardId: objectIdSchema
+    cardId: z.string().min(1, "Invalid id format")
 });
 
 export const createCardBodySchema = z.object({

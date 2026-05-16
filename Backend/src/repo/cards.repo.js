@@ -1,23 +1,38 @@
-import Card from "../models/card.schema.js";
-import Note from "../models/notes.schema.js";
-import Checklist from "../models/checklist.schema.js";
+import prisma from "../db/prismaClient.js";
+
+const NOTE_FIELDS = {
+    id: true,
+    prospectId: true,
+    content: true,
+    createdAt: true
+};
+
+const CHECKLIST_FIELDS = {
+    id: true,
+    prospectId: true,
+    stepNumber: true,
+    title: true,
+    description: true,
+    assignee: true,
+    status: true,
+    dueDate: true,
+    createdAt: true,
+    updatedAt: true
+};
 
 export default class Repositories {
     // CARDS (Prospects)
 
     async getAllCards({ page, limit }) {
-
-        //for frontend data must be in order  for cards to be created..
-
         const skip = (page - 1) * limit;
 
         const [totalItems, cards] = await Promise.all([
-            Card.countDocuments(),
-            Card.find({})
-                .sort({ createdAt: -1 })
-                .skip(skip)
-                .limit(limit)
-                .lean()
+            prisma.prospect.count(),
+            prisma.prospect.findMany({
+                orderBy: { createdAt: "desc" },
+                skip,
+                take: limit
+            })
         ]);
 
         const groupedMap = new Map();
@@ -28,7 +43,7 @@ export default class Repositories {
             }
 
             groupedMap.get(card.stage).push({
-                id: card._id,
+                id: card.id,
                 name: card.name,
                 school: card.school,
                 role: card.role,
@@ -58,34 +73,75 @@ export default class Repositories {
     }
 
     async getCardById(id) {
-        return await Card.findById(id);
+        return await prisma.prospect.findUnique({
+            where: { id },
+            include: {
+                notes: {
+                    select: NOTE_FIELDS,
+                    orderBy: { createdAt: "desc" }
+                },
+                checklistItems: {
+                    select: CHECKLIST_FIELDS,
+                    orderBy: { stepNumber: "asc" }
+                }
+            }
+        });
     }
 
     async createCard(data) {
-        const card = new Card(data);
-        return await card.save();
+        return await prisma.prospect.create({
+            data: {
+                name: data.name,
+                school: data.school,
+                role: data.role || null,
+                email: data.email || null,
+                phone: data.phone || null,
+                source: data.source || "Direct",
+                stage: data.stage || "Cold",
+                lastContactDate: data.lastContactDate ? new Date(data.lastContactDate) : null,
+                nextFollowUpDate: data.nextFollowUpDate ? new Date(data.nextFollowUpDate) : null
+            }
+        });
     }
 
     async deleteCard(id) {
-        return await Card.findByIdAndDelete(id);
+        const existing = await prisma.prospect.findUnique({
+            where: { id },
+            select: { id: true }
+        });
+
+        if (!existing) {
+            return null;
+        }
+
+        return await prisma.prospect.delete({
+            where: { id }
+        });
     }
 
      // NOTES (Append-only in side cards)
 
     async addNote(prospectId, content) {
-        const note = new Note({ prospectId, content });
-        return await note.save();
+        return await prisma.prospectNote.create({
+            data: {
+                prospectId,
+                content
+            }
+        });
     }
 
     async getNotesByProspect(prospectId, { page, limit }) {
         const skip = (page - 1) * limit;
 
         const [totalItems, notes] = await Promise.all([
-            Note.countDocuments({ prospectId }),
-            Note.find({ prospectId })
-                .sort({ createdAt: -1 })
-                .skip(skip)
-                .limit(limit)
+            prisma.prospectNote.count({ where: { prospectId } }),
+            prisma.prospectNote.findMany({
+                where: { prospectId },
+                orderBy: { createdAt: "desc" },
+                skip,
+                take: limit,
+                select: NOTE_FIELDS
+            })
         ]);
 
         return {
@@ -105,11 +161,14 @@ export default class Repositories {
         const skip = (page - 1) * limit;
 
         const [totalItems, checklist] = await Promise.all([
-            Checklist.countDocuments({ prospectId }),
-            Checklist.find({ prospectId })
-                .sort({ stepNumber: 1 })
-                .skip(skip)
-                .limit(limit)
+            prisma.onboardingChecklist.count({ where: { prospectId } }),
+            prisma.onboardingChecklist.findMany({
+                where: { prospectId },
+                orderBy: { stepNumber: "asc" },
+                skip,
+                take: limit,
+                select: CHECKLIST_FIELDS
+            })
         ]);
 
         return {
@@ -125,14 +184,25 @@ export default class Repositories {
 
 
     async checklistExists(prospectId) {
-        return await Checklist.exists({ prospectId });
+        return await prisma.onboardingChecklist.findFirst({
+            where: { prospectId },
+            select: { id: true }
+        });
     }
 
     async updateChecklistStatus(id, status) {
-        return await Checklist.findByIdAndUpdate(
-            id,
-            { $set: { status } },
-            { returnDocument: 'after', runValidators: true }
-        );
+        const existing = await prisma.onboardingChecklist.findUnique({
+            where: { id },
+            select: { id: true }
+        });
+
+        if (!existing) {
+            return null;
+        }
+
+        return await prisma.onboardingChecklist.update({
+            where: { id },
+            data: { status }
+        });
     }
 }
