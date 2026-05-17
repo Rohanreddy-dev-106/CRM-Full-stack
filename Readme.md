@@ -46,13 +46,30 @@ The system follows a **decoupled architecture**: a Node.js/Express REST API back
 
 ## 2. Tech Stack
 
-### Backend
+### Backend - Version 1 (Legacy)
 
 | Layer | Technology | Version |
 |---|---|---|
 | Runtime | Node.js (ES Modules) | ≥ 18.x |
 | Framework | Express | 5.x |
 | Database | MongoDB via Mongoose | 9.x |
+| Authentication | JSON Web Tokens (JWT) | 9.x |
+| Password Hashing | bcrypt | 6.x |
+| Input Validation | Zod | 4.x |
+| Rate Limiting | express-rate-limit | 8.x |
+| Cookie Parsing | cookie-parser | 1.x |
+| CORS | cors | 2.x |
+| Dev Server | nodemon | 3.x |
+| Environment | dotenv | 17.x |
+
+### Backend - Version 2 (Current)
+
+| Layer | Technology | Version |
+|---|---|---|
+| Runtime | Node.js (ES Modules) | ≥ 18.x |
+| Framework | Express | 5.x |
+| Database | MySQL / MariaDB | 3.5.x |
+| ORM | Prisma | 7.8.x |
 | Authentication | JSON Web Tokens (JWT) | 9.x |
 | Password Hashing | bcrypt | 6.x |
 | Input Validation | Zod | 4.x |
@@ -114,8 +131,9 @@ The system follows a **decoupled architecture**: a Node.js/Express REST API back
                        │ Mongoose ODM
                        ▼
 ┌──────────────────────────────────────────────────────────┐
-│                     MongoDB                               │
-│   Collections: users, cards, notes, onboardingchecklists │
+│             Database (Version 1 vs Version 2)             │
+│   V1: MongoDB (Collections: users, cards, etc.)           │
+│   V2: MySQL / MariaDB via Prisma ORM                      │
 └──────────────────────────────────────────────────────────┘
 ```
 
@@ -129,13 +147,17 @@ The Next.js frontend **never exposes the backend URL to the browser directly** f
 project-root/
 ├── Backend/
 │   ├── index.js                  ← Express app factory (middleware + routes)
-│   ├── server.js                 ← Entry point (starts server, connects DB)
+│   ├── server.js                 ← Entry point (starts server)
 │   ├── package.json
+│   ├── prisma/                   ← Version 2 Database ORM
+│   │   └── schema.prisma         ← Prisma models (User, Prospect, etc.)
 │   └── src/
 │       ├── .env                  ← Runtime secrets (never commit this)
 │       ├── .env.example          ← Template for environment variables
 │       ├── config/
-│       │   └── mondodb.config.js ← Mongoose connection setup
+│       │   └── mondodb.config.js ← Version 1 Mongoose connection setup
+│       ├── db/
+│       │   └── prismaClient.js   ← Version 2 Prisma client instantiation
 │       ├── controllers/
 │       │   ├── auth.controller.js    ← register, login, me, logout, user mgmt
 │       │   ├── main.controller.js    ← cards, notes, checklist CRUD
@@ -143,14 +165,14 @@ project-root/
 │       ├── middleware/
 │       │   ├── auth.middleware.js    ← requireAuth + authorizeRoles guards
 │       │   └── validate.middleware.js ← Zod request validation wrapper
-│       ├── models/
-│       │   ├── user.schema.js        ← User (name, email, password, role)
-│       │   ├── card.schema.js        ← Prospect/Card (pipeline entity)
-│       │   ├── notes.schema.js       ← Notes linked to a card
-│       │   └── checklist.schema.js   ← 10-step onboarding checklist per card
+│       ├── models/                 ← Version 1 Mongoose schemas
+│       │   ├── user.schema.js        
+│       │   ├── card.schema.js        
+│       │   ├── notes.schema.js       
+│       │   └── checklist.schema.js   
 │       ├── repo/
-│       │   ├── cards.repo.js         ← Data access layer for cards
-│       │   └── analytics.repo.js     ← MongoDB aggregation pipelines
+│       │   ├── cards.repo.js         ← Data access layer (Prisma in V2)
+│       │   └── analytics.repo.js     ← Aggregations (Prisma raw SQL in V2)
 │       ├── routers/
 │       │   ├── auth.routes.js        ← Auth route definitions
 │       │   └── main.routs.js         ← Cards / notes / checklist / analytics routes
@@ -312,10 +334,13 @@ Before running this project, ensure you have the following installed:
 |---|---|---|
 | Node.js | 18.x | `node --version` |
 | npm | 9.x | `npm --version` |
-| MongoDB | 6.x (local) or Atlas | — |
+| Database (V1) | MongoDB 6.x or Atlas | — |
+| Database (V2) | MySQL or MariaDB | `mysql --version` |
 | Git | Any | `git --version` |
 
-> **MongoDB**: You can use a local MongoDB instance or a free [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) cluster. No schema migrations are required — Mongoose handles collection creation automatically on first write.
+> **Database Setup**: 
+> - For **Version 1**, Mongoose handles collection creation automatically. 
+> - For **Version 2**, run `npx prisma db push` or `npx prisma migrate dev` to generate the MySQL tables.
 
 ---
 
@@ -335,10 +360,13 @@ Then fill in each value:
 # Server
 PORT=6060
 
-# Database
+# Database (Version 1 - MongoDB)
 MONGODB_CONNECTION_STRING=mongodb://localhost:27017/kalnet-crm
 # For MongoDB Atlas:
 # MONGODB_CONNECTION_STRING=mongodb+srv://<user>:<password>@cluster.mongodb.net/kalnet-crm?retryWrites=true&w=majority
+
+# Database (Version 2 - Prisma/MySQL)
+DATABASE_URL="mysql://root:password@localhost:3306/kalnet_crm"
 
 # Authentication
 JWT_SECRET=your-very-long-random-secret-at-least-64-characters
