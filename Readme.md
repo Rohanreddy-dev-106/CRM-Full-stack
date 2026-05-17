@@ -26,7 +26,7 @@
 18. [Production Deployment](#18-production-deployment)
 19. [Common Issues & Troubleshooting](#19-common-issues--troubleshooting)
 20. [Contributing](#20-contributing)
-21. [License](#21-license)
+
 
 ---
 
@@ -1197,15 +1197,3 @@ NEXT_PUBLIC_BACKEND_URL=https://api.yourdomain.com
 - Business logic belongs in `/src/service/`, data access in `/src/repo/`, HTTP handling in `/src/controllers/`
 - Frontend components use TypeScript — all props must be typed
 - Tailwind classes should use the project's design tokens where possible
-
----
-
-## 21. License
-
-This project is proprietary software owned by KALNET. All rights reserved.
-
-Unauthorized copying, distribution, or modification of this software is strictly prohibited without prior written permission from the copyright holder.
-
----
-
-*Built with ❤️ by the KALNET Engineering Team*
