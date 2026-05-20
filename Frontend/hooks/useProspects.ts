@@ -25,7 +25,18 @@ export function useProspects(): UseProspectsReturn {
     try {
       setLoading(true);
       const res = await fetch("/api/prospects");
-      if (!res.ok) throw new Error("Failed to fetch prospects");
+      if (!res.ok) {
+        let message = "Failed to fetch prospects";
+        try {
+          const payload = await res.json();
+          if (payload?.error && typeof payload.error === "string") {
+            message = payload.error;
+          }
+        } catch {
+          // Ignore JSON parse errors and keep fallback message.
+        }
+        throw new Error(`${res.status}: ${message}`);
+      }
       const data = await res.json();
       setProspects(Array.isArray(data) ? data : data.data ?? []);
       setError(null);

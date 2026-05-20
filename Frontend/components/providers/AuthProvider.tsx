@@ -2,7 +2,6 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
 
 interface User {
   id: string;
@@ -34,7 +33,6 @@ export function useAuth() {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
 
   // Check auth status on mount
   useEffect(() => {
@@ -71,8 +69,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     setUser(data.user);
-    router.push("/");
-  }, [router]);
+    window.location.assign("/");
+  }, []);
 
   const register = useCallback(async (name: string, email: string, password: string) => {
     const res = await fetch("/api/auth/register", {
@@ -88,14 +86,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     setUser(data.user);
-    router.push("/");
-  }, [router]);
+    window.location.assign("/");
+  }, []);
 
   const logout = useCallback(async () => {
     await fetch("/api/auth/logout", { method: "POST" });
     setUser(null);
-    router.push("/login");
-  }, [router]);
+    window.location.assign("/login");
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, loading, login, register, logout }}>

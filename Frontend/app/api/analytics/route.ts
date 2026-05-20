@@ -22,8 +22,14 @@ export async function GET() {
     const sixMonthsAgo = new Date(now);
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
-    const [totalProspects, closedCount, overdueCount, closedThisMonth, stageRows, monthlyTrendRows] =
-      await Promise.all([
+    const [totalProspects, closedCount, overdueCount, closedThisMonth, stageRows, monthlyTrendRows]: [
+      number,
+      number,
+      number,
+      number,
+      Array<{ stage: string; count: bigint | number; avgDays: number | null }>,
+      Array<{ year: number; month: number; count: bigint | number }>
+    ] = await Promise.all([
         prisma.prospect.count({ where: { deletedAt: null } }),
         prisma.prospect.count({ where: { stage: "Pilot Closed", deletedAt: null } }),
         prisma.prospect.count({

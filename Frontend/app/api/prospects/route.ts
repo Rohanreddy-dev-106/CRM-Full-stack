@@ -93,8 +93,9 @@ export async function GET(req: NextRequest) {
     const message = err instanceof Error ? err.message : "Failed to fetch prospects";
     const rsaHint = message.includes("allowPublicKeyRetrieval")
       ? "Database auth failed: enable MARIADB_ALLOW_PUBLIC_KEY_RETRIEVAL=true in Backend/.env and restart dev servers."
-      : "Failed to fetch prospects";
-    return jsonWithHeaders({ error: rsaHint }, { status: 500 });
+      : message;
+    const errorMessage = process.env.NODE_ENV === "development" ? rsaHint : "Failed to fetch prospects";
+    return jsonWithHeaders({ error: errorMessage }, { status: 500 });
   }
 }
 
