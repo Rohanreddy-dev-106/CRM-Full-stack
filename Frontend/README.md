@@ -1,8 +1,8 @@
-# KALNET CRM — FS-5 Internal CRM + Client Onboarding
+# EnrollOps CRM — FS-5 Internal CRM + Client Onboarding
 
 **System 3 · Full Stack · April 2026**
 
-Issued by: Rishav Raj, CTO & Co-Founder | KALNET
+Issued by: Rishav Raj, CTO & Co-Founder | EnrollOps
 
 ---
 
@@ -22,7 +22,7 @@ Issued by: Rishav Raj, CTO & Co-Founder | KALNET
 ## Project Structure
 
 ```
-kalnet-crm/
+enrollops-crm/
 ├── app/
 │   ├── (dashboard)/                  # Route group — all pages with Sidebar
 │   │   ├── layout.tsx                # Dashboard shell: Sidebar + main
@@ -145,5 +145,7 @@ npm run dev
 
 ---
 
-*KALNET · FS-5 Internal CRM · April 2026 · Confidential*
-"# FS5-KALNET" 
+*EnrollOps · FS-5 Internal CRM · April 2026 · Confidential*
+"# FS5-EnrollOps" 
+
+

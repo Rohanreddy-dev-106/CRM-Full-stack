@@ -4,7 +4,7 @@ import { Providers } from "./providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "KALNET CRM",
+  title: "EnrollOps CRM",
   description: "Internal CRM + Client Onboarding — System 3",
 };
 
@@ -17,3 +17,4 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   );
 }
+

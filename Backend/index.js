@@ -62,7 +62,7 @@ const authLimiter = rateLimit({
 
 // ─── Routes ──────────────────────────────────────────────────────
 server.get("/", (req, res) => {
-    res.json({ success: true, message: "KALNET CRM API is running", version: "1.0.0" });
+    res.json({ success: true, message: "EnrollOps CRM API is running", version: "1.0.0" });
 });
 
 server.use("/api/auth", authLimiter, AuthRoutes);
@@ -124,3 +124,4 @@ if (process.env.SENTRY_DSN) {
 }
 
 export default server;
+

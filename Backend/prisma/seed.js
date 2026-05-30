@@ -135,7 +135,7 @@ async function main() {
                     stepNumber: index + 1,
                     title,
                     description: title,
-                    assignee: "KALNET Ops",
+                    assignee: "EnrollOps Ops",
                     status: "todo",
                     dueDate: new Date(Date.now() + (index + 1) * 86400000)
                 })),
