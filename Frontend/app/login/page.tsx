@@ -36,7 +36,7 @@ export default function LoginPage() {
             <Zap className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-ink-1">KALNET CRM</h1>
+            <h1 className="text-xl font-bold text-ink-1">EnrollOps CRM</h1>
             <p className="text-[11px] font-mono text-ink-4">Internal System</p>
           </div>
         </div>
@@ -124,9 +124,10 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-[11px] text-ink-5 font-mono mt-6">
-          KALNET CRM · Internal Use Only
+          EnrollOps CRM · Internal Use Only
         </p>
       </div>
     </div>
   );
 }
+

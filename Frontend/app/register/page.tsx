@@ -39,7 +39,7 @@ export default function RegisterPage() {
             <Zap className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-ink-1">KALNET CRM</h1>
+            <h1 className="text-xl font-bold text-ink-1">EnrollOps CRM</h1>
             <p className="text-[11px] font-mono text-ink-4">Create Account</p>
           </div>
         </div>
@@ -48,7 +48,7 @@ export default function RegisterPage() {
         <div className="bg-surface-1 border border-ink-5 rounded-2xl p-8 shadow-card">
           <div className="mb-6">
             <h2 className="text-lg font-semibold text-ink-1">Create your account</h2>
-            <p className="text-sm text-ink-4 mt-1">Get started with KALNET CRM</p>
+            <p className="text-sm text-ink-4 mt-1">Get started with EnrollOps CRM</p>
           </div>
 
           {error && (
@@ -163,10 +163,11 @@ export default function RegisterPage() {
         </div>
 
         <p className="text-center text-[11px] text-ink-5 font-mono mt-6">
-          KALNET CRM · Internal Use Only
+          EnrollOps CRM · Internal Use Only
         </p>
       </div>
     </div>
   );
 }
+
 

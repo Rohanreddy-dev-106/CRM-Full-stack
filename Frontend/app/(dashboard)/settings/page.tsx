@@ -20,7 +20,7 @@ const DEFAULT_SETTINGS: SettingsState = {
   weeklyDigest: false,
 };
 
-const STORAGE_KEY = "kalnet_crm_settings_v1";
+const STORAGE_KEY = "enrollops_crm_settings_v1";
 
 export default function SettingsPage() {
   const { user, loading, logout } = useAuth();
@@ -166,3 +166,5 @@ function ToggleRow({
     </div>
   );
 }
+
+

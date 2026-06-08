@@ -1,5 +1,5 @@
 {
-  "name": "kalnet-crm",
+  "name": "enrollops-crm",
   "version": "1.0.0",
   "private": true,
   "engines": {
@@ -39,3 +39,5 @@
     "vitest": "^3.2.4"
   }
 }
+
+

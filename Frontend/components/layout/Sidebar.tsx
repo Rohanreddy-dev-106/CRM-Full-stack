@@ -34,7 +34,7 @@ export function Sidebar() {
           <Zap className="w-4 h-4 text-white" />
         </div>
         <div>
-          <p className="text-sm font-bold text-ink-1 leading-none">KALNET</p>
+          <p className="text-sm font-bold text-ink-1 leading-none">EnrollOps</p>
           <p className="text-[10px] font-mono text-ink-4 mt-0.5">CRM · Internal</p>
         </div>
       </div>
@@ -94,3 +94,4 @@ export function Sidebar() {
     </aside>
   );
 }
+

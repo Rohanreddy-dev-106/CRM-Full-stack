@@ -6,6 +6,8 @@ import rateLimit from "express-rate-limit";
 import * as Sentry from "@sentry/node";
 import MainRoutes from "./src/routers/main.routs.js";
 import AuthRoutes from "./src/routers/auth.routes.js";
+import NotificationRoutes from "./src/routers/notification.routes.js";
+import DebugRoutes from "./src/routers/debug.routes.js";
 
 dotenv.config();
 
@@ -62,10 +64,12 @@ const authLimiter = rateLimit({
 
 // ─── Routes ──────────────────────────────────────────────────────
 server.get("/", (req, res) => {
-    res.json({ success: true, message: "KALNET CRM API is running", version: "1.0.0" });
+    res.json({ success: true, message: "EnrollOps CRM API is running", version: "1.0.0" });
 });
 
 server.use("/api/auth", authLimiter, AuthRoutes);
+server.use("/api/notifications", apiLimiter, NotificationRoutes);
+server.use("/api/debug", apiLimiter, DebugRoutes);
 server.use("/api", apiLimiter, MainRoutes);
 
 // ─── 404 Handler ─────────────────────────────────────────────────
@@ -124,3 +128,4 @@ if (process.env.SENTRY_DSN) {
 }
 
 export default server;
+
