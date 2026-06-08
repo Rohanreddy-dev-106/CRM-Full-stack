@@ -1,4 +1,4 @@
-# KALNET CRM
+# EdTech CRM
 
 > **A full-stack, role-based CRM system for managing school prospects through a structured sales pipeline — from first contact to pilot close.**
 
