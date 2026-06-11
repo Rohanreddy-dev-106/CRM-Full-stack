@@ -10,7 +10,7 @@ import { ANALYTICS_ROLES, PROSPECT_VIEW_ROLES, hasRoleAccess, type Role } from "
 import type { ComponentType } from "react";
 
 const NAV_ITEMS = [
-  { href: "/", icon: Kanban, label: "Pipeline", allowedRoles: PROSPECT_VIEW_ROLES },
+  { href: "/dashboard", icon: Kanban, label: "Pipeline", allowedRoles: PROSPECT_VIEW_ROLES },
   { href: "/admin/crm/analytics", icon: BarChart3, label: "Analytics", allowedRoles: ANALYTICS_ROLES },
   { href: "/settings", icon: Settings, label: "Settings", allowedRoles: PROSPECT_VIEW_ROLES },
 ];
@@ -34,7 +34,7 @@ export function Sidebar() {
           <Zap className="w-4 h-4 text-white" />
         </div>
         <div>
-          <p className="text-sm font-bold text-ink-1 leading-none">EnrollOps</p>
+          <p className="text-sm font-bold text-ink-1 leading-none">EduFlow</p>
           <p className="text-[10px] font-mono text-ink-4 mt-0.5">CRM · Internal</p>
         </div>
       </div>
@@ -45,7 +45,7 @@ export function Sidebar() {
           Menu
         </p>
         {NAV_ITEMS.filter(({ allowedRoles }: NavItem) => hasRoleAccess(user?.role, allowedRoles)).map(({ href, icon: Icon, label }) => {
-          const active = pathname === href;
+          const active = href === "/dashboard" ? pathname.startsWith("/dashboard") : pathname === href;
           return (
             <Link
               key={href}

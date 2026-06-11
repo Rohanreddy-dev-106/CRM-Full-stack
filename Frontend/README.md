@@ -1,8 +1,8 @@
-# EnrollOps CRM — FS-5 Internal CRM + Client Onboarding
+# EduFlow CRM — FS-5 Internal CRM + Client Onboarding
 
 **System 3 · Full Stack · April 2026**
 
-Issued by: Rishav Raj, CTO & Co-Founder | EnrollOps
+Issued by: Rishav Raj, CTO & Co-Founder | EduFlow
 
 ---
 
@@ -22,11 +22,12 @@ Issued by: Rishav Raj, CTO & Co-Founder | EnrollOps
 ## Project Structure
 
 ```
-enrollops-crm/
+eduflow-crm/
 ├── app/
 │   ├── (dashboard)/                  # Route group — all pages with Sidebar
 │   │   ├── layout.tsx                # Dashboard shell: Sidebar + main
-│   │   ├── page.tsx                  # /  → Kanban pipeline board
+│   │   ├── page.tsx                  # /  → Public landing page
+│   │   ├── (dashboard)/dashboard/page.tsx  # /dashboard → Kanban pipeline board
 │   │   ├── settings/page.tsx         # /settings
 │   │   └── admin/crm/analytics/
 │   │       └── page.tsx              # /admin/crm/analytics
@@ -145,5 +146,5 @@ npm run dev
 
 ---
 
-*EnrollOps · FS-5 Internal CRM · April 2026 · Confidential*
-"# FS5-EnrollOps" 
+*EduFlow · FS-5 Internal CRM · April 2026 · Confidential*
+"# FS5-EduFlow" 

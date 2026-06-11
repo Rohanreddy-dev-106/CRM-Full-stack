@@ -70,7 +70,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     setUser(data.user);
-    window.location.assign(data.user?.role === "admin" ? "/admin/crm/analytics" : "/");
+    window.location.assign(data.user?.role === "admin" ? "/admin/crm/analytics" : "/dashboard");
   }, []);
 
   const register = useCallback(async (name: string, email: string, password: string, role: Role) => {
@@ -87,7 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     setUser(data.user);
-    window.location.assign(data.user?.role === "admin" ? "/admin/crm/analytics" : "/");
+    window.location.assign(data.user?.role === "admin" ? "/admin/crm/analytics" : "/dashboard");
   }, []);
 
   const logout = useCallback(async () => {

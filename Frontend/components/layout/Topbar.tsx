@@ -1,10 +1,10 @@
 // components/layout/Topbar.tsx
 "use client";
 
-import { useState } from "react";
 import { Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { NotificationBell } from "./NotificationBell";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 interface TopbarProps {
   title: string;
@@ -24,6 +24,7 @@ export function Topbar({ title, onAddProspect }: TopbarProps) {
             className="bg-surface-3 border border-ink-5 rounded-md pl-8 pr-3 py-1.5 text-sm text-ink-1 placeholder:text-ink-5 focus:outline-none focus:border-brand-500 w-52"
           />
         </div>
+        <ThemeToggle className="hidden sm:inline-flex" />
         <NotificationBell />
         {onAddProspect && (
           <Button size="sm" onClick={onAddProspect}>

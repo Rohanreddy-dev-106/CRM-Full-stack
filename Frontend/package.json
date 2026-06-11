@@ -1,5 +1,5 @@
 {
-  "name": "enrollops-crm",
+  "name": "eduflow-crm",
   "version": "1.0.0",
   "private": true,
   "engines": {
@@ -10,13 +10,17 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "prisma:generate": "prisma generate",
     "test": "vitest run"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^16.6.0",
+    "@prisma/adapter-mariadb": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "clsx": "^2.1.0",
     "date-fns": "^3.6.0",
+    "dotenv": "^17.4.2",
+    "framer-motion": "^12.40.0",
     "lucide-react": "^0.376.0",
     "next": "14.2.34",
     "react": "18.2.0",
@@ -39,5 +43,3 @@
     "vitest": "^3.2.4"
   }
 }
-
-

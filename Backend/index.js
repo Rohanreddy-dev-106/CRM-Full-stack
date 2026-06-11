@@ -64,7 +64,7 @@ const authLimiter = rateLimit({
 
 // ─── Routes ──────────────────────────────────────────────────────
 server.get("/", (req, res) => {
-    res.json({ success: true, message: "EnrollOps CRM API is running", version: "1.0.0" });
+    res.json({ success: true, message: "EduFlow CRM API is running", version: "1.0.0" });
 });
 
 server.use("/api/auth", authLimiter, AuthRoutes);

@@ -160,7 +160,7 @@ async function main() {
                     stepNumber: index + 1,
                     title,
                     description: title,
-                    assignee: "EnrollOps Ops",
+                    assignee: "EduFlow Ops",
                     status: "todo",
                     dueDate: new Date(Date.now() + (index + 1) * 86400000)
                 })),

@@ -70,6 +70,18 @@ export async function backendFetch(path: string, options: FetchOptions = {}) {
   return res;
 }
 
+export async function apiCall(path: string, options: FetchOptions = {}) {
+  const normalizedPath = path.startsWith("/api") ? path : `/api${path}`;
+  const response = await backendFetch(normalizedPath, options);
+  const contentType = response.headers.get("content-type") || "";
+
+  if (contentType.includes("application/json")) {
+    return response.json();
+  }
+
+  return response.text();
+}
+
 // ─── Map a single backend card → frontend Prospect shape ─────────
 
 export function mapCardToProspect(card: any) {

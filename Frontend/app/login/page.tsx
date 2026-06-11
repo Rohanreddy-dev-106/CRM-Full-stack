@@ -36,7 +36,7 @@ export default function LoginPage() {
             <Zap className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-ink-1">EnrollOps CRM</h1>
+            <h1 className="text-xl font-bold text-ink-1">EduFlow CRM</h1>
             <p className="text-[11px] font-mono text-ink-4">Internal System</p>
           </div>
         </div>
@@ -124,8 +124,17 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-[11px] text-ink-5 font-mono mt-6">
-          EnrollOps CRM · Internal Use Only
+          EduFlow CRM · Internal Use Only
         </p>
+
+        <div className="mt-4 flex justify-center">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 rounded-full border border-ink-5 bg-surface-1 px-4 py-2 text-sm font-medium text-ink-2 transition-all duration-200 hover:-translate-y-0.5 hover:border-ink-4 hover:bg-surface-2"
+          >
+            Back to Home
+          </Link>
+        </div>
       </div>
     </div>
   );

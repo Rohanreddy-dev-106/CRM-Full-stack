@@ -21,8 +21,11 @@ export function middleware(request: NextRequest) {
 
   // Public routes that don't require authentication
   // /api/* routes handle their own auth — don't redirect them
-  const publicPaths = ["/login", "/register", "/api/auth/"];
-  const isPublic = publicPaths.some((p) => pathname.startsWith(p));
+  const isPublic =
+    pathname === "/" ||
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/register") ||
+    pathname.startsWith("/api/auth/");
 
   // Allow public routes and static assets
   if (isPublic || pathname.startsWith("/_next") || pathname.startsWith("/favicon")) {

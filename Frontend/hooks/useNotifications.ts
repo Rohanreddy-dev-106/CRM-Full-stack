@@ -1,39 +1,58 @@
 import { useEffect, useState, useCallback } from "react";
 import { apiCall } from "@/lib/api";
 
+export type NotificationItem = {
+  id: string;
+  read?: boolean;
+  type?: string;
+  title?: string;
+  message?: string;
+  createdAt?: string;
+  metadata?: {
+    prospectIds?: string[];
+  };
+};
+
+type NotificationsResponse = {
+  success: boolean;
+  data?: NotificationItem[];
+  unreadCount?: number;
+};
+
 export function useNotifications() {
-  const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Fetch all notifications
   const fetchNotifications = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await apiCall("/notifications", {
+      const response = (await apiCall("/notifications", {
         method: "GET",
-      });
+      })) as NotificationsResponse;
 
       if (response.success) {
         setNotifications(response.data || []);
         setUnreadCount(response.unreadCount || 0);
       }
     } catch (err) {
+      const message = err instanceof Error ? err.message : "Unable to fetch notifications";
       console.error("Error fetching notifications:", err);
-      setError(err.message);
+      setError(message);
     } finally {
       setLoading(false);
     }
   }, []);
 
   // Mark notification as read
-  const markAsRead = useCallback(async (notificationId) => {
+  const markAsRead = useCallback(async (notificationId: string) => {
     try {
-      const response = await apiCall(`/notifications/${notificationId}/read`, {
+      const response = (await apiCall(`/notifications/${notificationId}/read`, {
         method: "PATCH",
-      });
+      })) as NotificationsResponse;
 
       if (response.success) {
         setNotifications((prev) =>
@@ -49,9 +68,9 @@ export function useNotifications() {
   // Fetch unread count periodically
   const fetchUnreadCount = useCallback(async () => {
     try {
-      const response = await apiCall("/notifications/unread-count", {
+      const response = (await apiCall("/notifications/unread-count", {
         method: "GET",
-      });
+      })) as NotificationsResponse;
 
       if (response.success) {
         setUnreadCount(response.unreadCount || 0);

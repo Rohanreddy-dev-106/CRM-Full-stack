@@ -236,11 +236,11 @@ export function ProspectDrawer({ open, prospect, canEdit = false, onClose, onUpd
                       </span>
                     )}
                   </div>
-                  <InfoRow
-                    icon={<Calendar className="w-4 h-4" />}
-                    label="Added"
-                    value={formatDate(prospect.createdAt)}
-                  />
+                    <InfoRow
+                      icon={<Calendar className="w-4 h-4" />}
+                      label="Added"
+                    value={formatDate(localProspect.createdAt)}
+                    />
                 </div>
               </section>
 
@@ -278,10 +278,10 @@ export function ProspectDrawer({ open, prospect, canEdit = false, onClose, onUpd
 
                 {/* Notes list */}
                 <div className="space-y-2.5">
-                  {(prospect.notes ?? []).length === 0 ? (
+                  {(localProspect.notes ?? []).length === 0 ? (
                     <p className="text-xs text-ink-5 font-mono text-center py-4">No notes yet</p>
                   ) : (
-                    (prospect.notes ?? []).map((note) => (
+                    (localProspect.notes ?? []).map((note) => (
                       <div key={note.id} className="bg-surface-2 rounded-lg border border-ink-5 p-3">
                         <p className="text-sm text-ink-2 leading-relaxed whitespace-pre-wrap">{note.content}</p>
                         <p className="text-[11px] text-ink-5 font-mono mt-2">

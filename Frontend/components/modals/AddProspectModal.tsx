@@ -24,6 +24,8 @@ export function AddProspectModal({ open, onClose, onCreate }: AddProspectModalPr
     phone: "",
     source: "Direct",
     stage: "COLD" as Stage,
+    completed: false,
+    completedAt: null as string | null,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,7 +40,17 @@ export function AddProspectModal({ open, onClose, onCreate }: AddProspectModalPr
         nextFollowUpDate: null,
       });
       // Reset form
-      setForm({ name: "", school: "", role: "", email: "", phone: "", source: "Direct", stage: "COLD" });
+      setForm({
+        name: "",
+        school: "",
+        role: "",
+        email: "",
+        phone: "",
+        source: "Direct",
+        stage: "COLD",
+        completed: false,
+        completedAt: null,
+      });
     } finally {
       setLoading(false);
     }

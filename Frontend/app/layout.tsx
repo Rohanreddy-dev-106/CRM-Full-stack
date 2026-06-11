@@ -1,22 +1,32 @@
-// app/layout.tsx
 import type { Metadata } from "next";
+import { Cormorant_Garamond, Inter } from "next/font/google";
 import { Providers } from "./providers";
 import { CustomCursor } from "@/components/ui/CustomCursor";
 import "./globals.css";
 
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+});
+
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-cormorant",
+});
+
 export const metadata: Metadata = {
-  title: "EnrollOps CRM",
-  description: "Internal CRM + Client Onboarding — System 3",
+  title: "EduFlow CRM",
+  description: "A premium landing page for EdTech sales teams.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
-      <body suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${cormorant.variable}`} suppressHydrationWarning>
+      <body className="font-sans antialiased" suppressHydrationWarning>
         <CustomCursor />
         <Providers>{children}</Providers>
       </body>
     </html>
   );
 }
-

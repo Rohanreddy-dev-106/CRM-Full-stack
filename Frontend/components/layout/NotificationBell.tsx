@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNotifications } from "@/hooks/useNotifications";
+import { type NotificationItem, useNotifications } from "@/hooks/useNotifications";
 import { cn } from "@/lib/utils";
 import { Bell, X, Check } from "lucide-react";
 
@@ -7,11 +7,11 @@ export function NotificationBell() {
   const { notifications, unreadCount, markAsRead } = useNotifications();
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleMarkAsRead = async (notificationId) => {
+  const handleMarkAsRead = async (notificationId: string) => {
     await markAsRead(notificationId);
   };
 
-  const getNotificationIcon = (type) => {
+  const getNotificationIcon = (type: string | undefined) => {
     switch (type) {
       case "overdue_prospects":
         return "🔴";
@@ -57,45 +57,45 @@ export function NotificationBell() {
           {/* Notifications List */}
           <div className="max-h-96 overflow-y-auto">
             {notifications && notifications.length > 0 ? (
-              notifications.map((notification) => (
-                <div
-                  key={notification.id}
-                  className={cn(
-                    "p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors",
-                    !notification.read && "bg-blue-50"
-                  )}
-                >
-                  <div className="flex items-start gap-3">
-                    <span className="text-lg mt-1">
-                      {getNotificationIcon(notification.type)}
-                    </span>
-                    <div className="flex-1">
-                      <h4 className="font-medium text-gray-900">
-                        {notification.title}
-                      </h4>
-                      <p className="text-sm text-gray-600 mt-1">
-                        {notification.message}
-                      </p>
-                      <p className="text-xs text-gray-400 mt-2">
-                        {new Date(notification.createdAt).toLocaleDateString()} at{" "}
-                        {new Date(notification.createdAt).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </p>
-                    </div>
-                    {!notification.read && (
-                      <button
-                        onClick={() => handleMarkAsRead(notification.id)}
-                        className="p-1 hover:bg-gray-200 rounded transition-colors"
-                        title="Mark as read"
-                      >
-                        <Check size={16} className="text-blue-600" />
-                      </button>
+              notifications.map((notification: NotificationItem) => {
+                const createdAt = notification.createdAt || new Date().toISOString();
+
+                return (
+                  <div
+                    key={notification.id}
+                    className={cn(
+                      "p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors",
+                      !notification.read && "bg-blue-50"
                     )}
+                  >
+                    <div className="flex items-start gap-3">
+                      <span className="text-lg mt-1">
+                        {getNotificationIcon(notification.type)}
+                      </span>
+                      <div className="flex-1">
+                        <h4 className="font-medium text-gray-900">{notification.title}</h4>
+                        <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
+                        <p className="text-xs text-gray-400 mt-2">
+                          {new Date(createdAt).toLocaleDateString()} at{" "}
+                          {new Date(createdAt).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </p>
+                      </div>
+                      {!notification.read && (
+                        <button
+                          onClick={() => handleMarkAsRead(notification.id)}
+                          className="p-1 hover:bg-gray-200 rounded transition-colors"
+                          title="Mark as read"
+                        >
+                          <Check size={16} className="text-blue-600" />
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             ) : (
               <div className="p-8 text-center text-gray-500">
                 <Bell size={32} className="mx-auto mb-2 opacity-50" />
