@@ -1,4 +1,3 @@
-// components/layout/Sidebar.tsx
 "use client";
 
 import Link from "next/link";
@@ -27,21 +26,24 @@ export function Sidebar() {
   const { user, logout } = useAuth();
 
   return (
-    <aside className="flex flex-col w-[220px] shrink-0 bg-surface-1 border-r border-ink-5 h-full">
-      {/* Logo */}
-      <div className="flex items-center gap-2.5 px-5 py-4 border-b border-ink-5">
-        <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
-          <Zap className="w-4 h-4 text-white" />
+    <aside className="flex shrink-0 flex-col border-b border-ink-5 bg-surface-1 md:h-dvh md:w-[220px] md:border-b-0 md:border-r">
+      <div className="flex items-center justify-between gap-3 border-b border-ink-5 px-4 py-3 md:justify-start md:px-5 md:py-4">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-500">
+            <Zap className="h-4 w-4 text-white" />
+          </div>
+          <div>
+            <p className="text-sm font-bold leading-none text-ink-1">EduFlow</p>
+            <p className="mt-0.5 font-mono text-[10px] text-ink-4">CRM · Internal</p>
+          </div>
         </div>
-        <div>
-          <p className="text-sm font-bold text-ink-1 leading-none">EduFlow</p>
-          <p className="text-[10px] font-mono text-ink-4 mt-0.5">CRM · Internal</p>
+        <div className="rounded-full border border-ink-5 px-2 py-1 text-[10px] font-mono uppercase tracking-widest text-ink-4 md:hidden">
+          Nav
         </div>
       </div>
 
-      {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-1">
-        <p className="text-[10px] font-mono font-semibold text-ink-5 uppercase tracking-widest px-2 mb-2">
+      <nav className="flex gap-2 overflow-x-auto px-3 py-3 md:flex-1 md:flex-col md:overflow-visible md:px-3 md:py-4 md:space-y-1">
+        <p className="hidden px-2 pb-1 text-[10px] font-mono font-semibold uppercase tracking-widest text-ink-5 md:block">
           Menu
         </p>
         {NAV_ITEMS.filter(({ allowedRoles }: NavItem) => hasRoleAccess(user?.role, allowedRoles)).map(({ href, icon: Icon, label }) => {
@@ -51,47 +53,45 @@ export function Sidebar() {
               key={href}
               href={href}
               className={cn(
-                "flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors",
+                "flex shrink-0 items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors md:w-full",
                 active
-                  ? "bg-brand-500/15 text-brand-400 font-medium"
-                  : "text-ink-4 hover:text-ink-2 hover:bg-surface-3"
+                  ? "bg-brand-500/15 font-medium text-brand-400"
+                  : "text-ink-4 hover:bg-surface-3 hover:text-ink-2"
               )}
             >
-              <Icon className="w-4 h-4 shrink-0" />
-              {label}
+              <Icon className="h-4 w-4 shrink-0" />
+              <span className="whitespace-nowrap">{label}</span>
             </Link>
           );
         })}
       </nav>
 
-      {/* User info + Logout */}
-      <div className="px-3 py-3 border-t border-ink-5">
+      <div className="border-t border-ink-5 px-3 py-3">
         {user ? (
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2.5 px-2">
-              <div className="w-8 h-8 rounded-full bg-brand-800 flex items-center justify-center">
-                <User className="w-3.5 h-3.5 text-brand-200" />
+          <div className="flex items-center justify-between gap-3 md:flex-col md:items-stretch">
+            <div className="flex min-w-0 items-center gap-2.5 px-1 md:px-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-800">
+                <User className="h-3.5 w-3.5 text-brand-200" />
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-ink-1 truncate">{user.name}</p>
-                <p className="text-[10px] font-mono text-ink-4 truncate">{user.role}</p>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-xs font-semibold text-ink-1">{user.name}</p>
+                <p className="truncate font-mono text-[10px] text-ink-4">{user.role}</p>
               </div>
             </div>
             <button
               onClick={logout}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs text-ink-4 hover:text-danger hover:bg-danger-muted transition-colors w-full"
+              className="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs text-ink-4 transition-colors hover:bg-danger-muted hover:text-danger md:w-full md:justify-center"
             >
-              <LogOut className="w-3.5 h-3.5" />
+              <LogOut className="h-3.5 w-3.5" />
               Sign Out
             </button>
           </div>
         ) : (
           <div className="px-2">
-            <p className="text-[10px] font-mono text-ink-5">System 3 · Full Stack</p>
+            <p className="font-mono text-[10px] text-ink-5">System 3 · Full Stack</p>
           </div>
         )}
       </div>
     </aside>
   );
 }
-

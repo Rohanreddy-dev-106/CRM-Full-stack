@@ -119,14 +119,14 @@ Full notifications center:
 EMAIL_FROM=noreply@crm.com
 FRONTEND_URL=http://localhost:3000
 
-# SMTP (Production - Gmail, AWS SES, etc.)
+# SMTP (recommended for reliable delivery)
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_SECURE=false
 SMTP_USER=your-email@gmail.com
 SMTP_PASS=your-app-password
 
-# Gmail Alternative (Simpler setup)
+# Gmail Alternative (only if SMTP is unavailable)
 GMAIL_USER=your-email@gmail.com
 GMAIL_PASS=your-app-password
 ```
@@ -257,7 +257,7 @@ The system sends beautifully formatted HTML emails with:
 ### Emails Not Sending
 
 1. **Check logs** for `[Email Service]` messages
-2. **Verify `.env`** has `SMTP_HOST` or `GMAIL_USER` + `GMAIL_PASS`
+2. **Verify `.env`** has `SMTP_HOST` + `SMTP_USER` + `SMTP_PASS` or `GMAIL_USER` + `GMAIL_PASS`
 3. **Test SMTP** connection:
    ```bash
    node -e "

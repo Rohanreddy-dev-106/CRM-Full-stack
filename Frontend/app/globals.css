@@ -187,3 +187,14 @@ body.dragging * {
   );
   filter: blur(20px);
 }
+
+@media (hover: none), (pointer: coarse) {
+  html,
+  body {
+    cursor: auto;
+  }
+
+  .custom-cursor-blob {
+    display: none;
+  }
+}

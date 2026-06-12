@@ -1,4 +1,3 @@
-// components/kanban/KanbanBoard.tsx
 "use client";
 
 import { useEffect, useMemo } from "react";
@@ -34,7 +33,6 @@ export function KanbanBoard({
   const { open, selectedProspect, openDrawer, closeDrawer, updateSelected } = useDrawer();
   const { user } = useAuth();
 
-  // Keep the selected prospect in the drawer in sync with parent prospects state (e.g. for newly added notes/checklist items)
   useEffect(() => {
     if (open && selectedProspect) {
       const latest = prospects.find((p) => p.id === selectedProspect.id);
@@ -46,7 +44,6 @@ export function KanbanBoard({
     }
   }, [prospects, open, selectedProspect, updateSelected]);
 
-  // Agents can only view — cannot move cards, edit or delete
   const canEdit = hasRoleAccess(user?.role, PROSPECT_EDIT_ROLES);
 
   const handleDragEnd = async (result: DropResult) => {
@@ -84,10 +81,10 @@ export function KanbanBoard({
 
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center">
+      <div className="flex flex-1 items-center justify-center">
         <div className="flex items-center gap-3 text-ink-4">
-          <span className="w-5 h-5 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
-          <span className="font-mono text-sm">Loading pipeline…</span>
+          <span className="h-5 w-5 animate-spin rounded-full border-2 border-brand-500 border-t-transparent" />
+          <span className="font-mono text-sm">Loading pipeline...</span>
         </div>
       </div>
     );
@@ -95,14 +92,14 @@ export function KanbanBoard({
 
   if (error) {
     return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="text-danger font-mono text-sm">Error: {error}</div>
+      <div className="flex flex-1 items-center justify-center">
+        <div className="font-mono text-sm text-danger">Error: {error}</div>
       </div>
     );
   }
 
   const columnsContent = (
-    <div className="flex gap-4 h-full items-start pt-2">
+    <div className="flex h-full items-start gap-3 pt-2 md:gap-4">
       {STAGE_ORDER.map((stage) => (
         <KanbanColumn
           key={stage}
@@ -116,7 +113,7 @@ export function KanbanBoard({
 
   return (
     <>
-      <div className="flex flex-col flex-1 min-h-0">
+      <div className="flex min-h-0 flex-1 flex-col">
         <KanbanHeader
           overdueCount={overdueProspects.length}
           dueTodayCount={dueTodayProspects.length}
@@ -126,16 +123,11 @@ export function KanbanBoard({
           onProspectClick={handleCardClick}
         />
 
-        {/* Scrollable board */}
-        <div className="flex-1 overflow-x-auto overflow-y-hidden px-6 pb-6">
+        <div className="flex-1 overflow-x-auto overflow-y-hidden px-4 pb-4 touch-pan-x overscroll-x-contain sm:px-6 sm:pb-6">
           {canEdit ? (
-            <DragDropContext onDragEnd={handleDragEnd}>
-              {columnsContent}
-            </DragDropContext>
+            <DragDropContext onDragEnd={handleDragEnd}>{columnsContent}</DragDropContext>
           ) : (
-            <DragDropContext onDragEnd={() => {}}>
-              {columnsContent}
-            </DragDropContext>
+            <DragDropContext onDragEnd={() => {}}>{columnsContent}</DragDropContext>
           )}
         </div>
       </div>
@@ -164,5 +156,3 @@ export function KanbanBoard({
     </>
   );
 }
-
-

@@ -1,10 +1,18 @@
-// components/drawers/ProspectDrawer.tsx
 "use client";
 
 import { useEffect, useRef, useState } from "react";
 import {
-  X, Mail, Phone, Building2, User, Tag, Calendar,
-  StickyNote, CheckSquare, Send, Clock, Trash2, CheckCircle,
+  X,
+  Mail,
+  Phone,
+  Building2,
+  User,
+  Tag,
+  Calendar,
+  Send,
+  Clock,
+  Trash2,
+  CheckCircle,
 } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -24,7 +32,15 @@ interface ProspectDrawerProps {
   onAddNote: (id: string, content: string) => Promise<void>;
 }
 
-export function ProspectDrawer({ open, prospect, canEdit = false, onClose, onUpdate, onDelete, onAddNote }: ProspectDrawerProps) {
+export function ProspectDrawer({
+  open,
+  prospect,
+  canEdit = false,
+  onClose,
+  onUpdate,
+  onDelete,
+  onAddNote,
+}: ProspectDrawerProps) {
   const [noteText, setNoteText] = useState("");
   const [addingNote, setAddingNote] = useState(false);
   const [noteError, setNoteError] = useState<string | null>(null);
@@ -39,12 +55,18 @@ export function ProspectDrawer({ open, prospect, canEdit = false, onClose, onUpd
   }, [prospect]);
 
   useEffect(() => {
-    if (!open) { setNoteText(""); setActiveTab("details"); setConfirmDelete(false); setNoteError(null); }
+    if (!open) {
+      setNoteText("");
+      setActiveTab("details");
+      setConfirmDelete(false);
+      setNoteError(null);
+    }
   }, [open]);
 
-  // Close on Escape
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
   }, [onClose]);
@@ -91,89 +113,77 @@ export function ProspectDrawer({ open, prospect, canEdit = false, onClose, onUpd
 
   return (
     <>
-      {/* Backdrop */}
       <div
         className={cn(
-          "fixed inset-0 bg-black/60 z-40 transition-opacity duration-300",
-          open ? "opacity-100" : "opacity-0 pointer-events-none"
+          "fixed inset-0 z-40 bg-black/60 transition-opacity duration-300",
+          open ? "opacity-100" : "pointer-events-none opacity-0"
         )}
         onClick={onClose}
       />
 
-      {/* Drawer */}
-        <div
-          className={cn(
-            "fixed right-0 top-0 h-full w-[480px] bg-surface-1 border-l border-ink-5 z-50",
-            "flex flex-col shadow-2xl transition-transform duration-300 ease-out",
-            open ? "translate-x-0" : "translate-x-full"
-          )}
+      <div
+        className={cn(
+          "fixed right-0 top-0 z-50 flex h-[100dvh] w-full max-w-[100vw] flex-col border-l border-ink-5 bg-surface-1 shadow-2xl transition-transform duration-300 ease-out sm:w-[92vw] sm:max-w-[480px] md:w-[480px]",
+          open ? "translate-x-0" : "translate-x-full"
+        )}
       >
-        {/* Header */}
-        <div className="flex items-start gap-3 px-5 py-4 border-b border-ink-5">
+        <div className="flex items-start gap-3 border-b border-ink-5 px-4 py-4 sm:px-5">
           <Avatar name={localProspect.name} size="lg" />
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
               <h2 className="text-lg font-semibold text-ink-1">{localProspect.name}</h2>
               <Badge variant="stage" stage={localProspect.stage}>
                 {stageConfig.label}
               </Badge>
               {localProspect.completed && (
-                <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-success/10 border border-success/30">
-                  <CheckCircle className="w-3.5 h-3.5 text-success" />
+                <div className="flex items-center gap-1 rounded-md border border-success/30 bg-success/10 px-2 py-1">
+                  <CheckCircle className="h-3.5 w-3.5 text-success" />
                   <span className="text-xs font-semibold text-success">Complete</span>
                 </div>
               )}
             </div>
-            <p className="text-sm text-ink-4 mt-0.5">{localProspect.role} · {localProspect.school}</p>
+            <p className="mt-0.5 text-sm text-ink-4">
+              {localProspect.role} - {localProspect.school}
+            </p>
           </div>
-          <div className="flex items-center gap-1 shrink-0">
-            {canEdit && onDelete && (
+          <div className="flex shrink-0 items-center gap-1">
+            {canEdit && onDelete ? (
               confirmDelete ? (
                 <div className="flex items-center gap-1">
-                  <Button
-                    size="sm"
-                    variant="danger"
-                    loading={deleting}
-                    onClick={handleDelete}
-                  >
+                  <Button size="sm" variant="danger" loading={deleting} onClick={handleDelete}>
                     Confirm
                   </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => setConfirmDelete(false)}
-                  >
+                  <Button size="sm" variant="ghost" onClick={() => setConfirmDelete(false)}>
                     Cancel
                   </Button>
                 </div>
               ) : (
                 <button
                   onClick={() => setConfirmDelete(true)}
-                  className="text-ink-4 hover:text-danger transition-colors p-1 rounded hover:bg-danger-muted"
+                  className="rounded p-1 text-ink-4 transition-colors hover:bg-danger-muted hover:text-danger"
                   title="Delete prospect"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="h-4 w-4" />
                 </button>
               )
-            )}
+            ) : null}
             <button
               onClick={onClose}
-              className="text-ink-4 hover:text-ink-1 transition-colors p-1 rounded hover:bg-surface-4"
+              className="rounded p-1 text-ink-4 transition-colors hover:bg-surface-4 hover:text-ink-1"
             >
-              <X className="w-5 h-5" />
+              <X className="h-5 w-5" />
             </button>
           </div>
         </div>
 
-        {/* Tabs */}
         {isPilotClosed && (
-          <div className="flex border-b border-ink-5 px-5">
+          <div className="flex border-b border-ink-5 px-4 sm:px-5">
             {(["details", "checklist"] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={cn(
-                  "py-2.5 px-1 mr-6 text-sm font-medium border-b-2 -mb-px transition-colors capitalize",
+                  "mr-6 -mb-px border-b-2 px-1 py-2.5 text-sm font-medium capitalize transition-colors",
                   activeTab === tab
                     ? "border-brand-500 text-brand-400"
                     : "border-transparent text-ink-4 hover:text-ink-2"
@@ -185,38 +195,35 @@ export function ProspectDrawer({ open, prospect, canEdit = false, onClose, onUpd
           </div>
         )}
 
-        {/* Scrollable content */}
         <div className="flex-1 overflow-y-auto">
           {activeTab === "details" ? (
-            <div className="p-5 flex flex-col gap-5">
-              {/* Contact info */}
+            <div className="flex flex-col gap-5 p-4 sm:p-5">
               <section>
-                <h3 className="text-[11px] font-mono font-semibold text-ink-4 uppercase tracking-widest mb-3">
+                <h3 className="mb-3 text-[11px] font-mono font-semibold uppercase tracking-widest text-ink-4">
                   Contact
                 </h3>
                 <div className="space-y-2.5">
-                  <InfoRow icon={<Mail className="w-4 h-4" />} label="Email" value={localProspect.email} />
-                  <InfoRow icon={<Phone className="w-4 h-4" />} label="Phone" value={localProspect.phone} />
-                  <InfoRow icon={<Building2 className="w-4 h-4" />} label="School" value={localProspect.school} />
-                  <InfoRow icon={<User className="w-4 h-4" />} label="Role" value={localProspect.role} />
-                  <InfoRow icon={<Tag className="w-4 h-4" />} label="Source" value={localProspect.source} />
+                  <InfoRow icon={<Mail className="h-4 w-4" />} label="Email" value={localProspect.email} />
+                  <InfoRow icon={<Phone className="h-4 w-4" />} label="Phone" value={localProspect.phone} />
+                  <InfoRow icon={<Building2 className="h-4 w-4" />} label="School" value={localProspect.school} />
+                  <InfoRow icon={<User className="h-4 w-4" />} label="Role" value={localProspect.role} />
+                  <InfoRow icon={<Tag className="h-4 w-4" />} label="Source" value={localProspect.source} />
                 </div>
               </section>
 
-              {/* Timeline */}
               <section>
-                <h3 className="text-[11px] font-mono font-semibold text-ink-4 uppercase tracking-widest mb-3">
+                <h3 className="mb-3 text-[11px] font-mono font-semibold uppercase tracking-widest text-ink-4">
                   Timeline
                 </h3>
                 <div className="space-y-2.5">
                   <InfoRow
-                    icon={<Clock className="w-4 h-4" />}
+                    icon={<Clock className="h-4 w-4" />}
                     label="Last Contact"
                     value={localProspect.lastContactDate ? formatRelative(localProspect.lastContactDate) : "Never"}
                   />
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2 text-ink-4 w-28 shrink-0">
-                      <Calendar className="w-4 h-4" />
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                    <div className="flex items-center gap-2 text-ink-4 sm:w-28 sm:shrink-0">
+                      <Calendar className="h-4 w-4" />
                       <span className="text-xs font-mono">Follow-up</span>
                     </div>
                     {canEdit ? (
@@ -228,65 +235,49 @@ export function ProspectDrawer({ open, prospect, canEdit = false, onClose, onUpd
                             await onUpdate(localProspect.id, { nextFollowUpDate: new Date(e.target.value).toISOString() });
                           }
                         }}
-                        className="flex-1 bg-surface-3 border border-ink-5 rounded px-2.5 py-1.5 text-xs font-mono text-ink-1 focus:outline-none focus:border-brand-500"
+                        className="flex-1 rounded border border-ink-5 bg-surface-3 px-2.5 py-1.5 text-xs font-mono text-ink-1 focus:border-brand-500 focus:outline-none"
                       />
                     ) : (
-                      <span className="text-sm text-ink-2 truncate">
-                        {localProspect.nextFollowUpDate ? formatDate(localProspect.nextFollowUpDate) : "—"}
+                      <span className="truncate text-sm text-ink-2">
+                        {localProspect.nextFollowUpDate ? formatDate(localProspect.nextFollowUpDate) : "-"}
                       </span>
                     )}
                   </div>
-                    <InfoRow
-                      icon={<Calendar className="w-4 h-4" />}
-                      label="Added"
-                    value={formatDate(localProspect.createdAt)}
-                    />
+                  <InfoRow icon={<Calendar className="h-4 w-4" />} label="Added" value={formatDate(localProspect.createdAt)} />
                 </div>
               </section>
 
-              {/* Notes */}
               <section>
-                <h3 className="text-[11px] font-mono font-semibold text-ink-4 uppercase tracking-widest mb-3">
+                <h3 className="mb-3 text-[11px] font-mono font-semibold uppercase tracking-widest text-ink-4">
                   Notes
                 </h3>
 
-                {/* Note input */}
-                <div className="bg-surface-2 rounded-lg border border-ink-5 overflow-hidden mb-3">
+                <div className="mb-3 overflow-hidden rounded-lg border border-ink-5 bg-surface-2">
                   <textarea
                     ref={textareaRef}
                     value={noteText}
                     onChange={(e) => setNoteText(e.target.value)}
-                    placeholder="Add a note…"
+                    placeholder="Add a note..."
                     rows={3}
-                    className="w-full bg-transparent px-3 py-2.5 text-sm text-ink-1 placeholder:text-ink-5 resize-none focus:outline-none"
+                    className="w-full resize-none bg-transparent px-3 py-2.5 text-sm text-ink-1 placeholder:text-ink-5 focus:outline-none"
                   />
-                  <div className="flex justify-end px-3 py-2 border-t border-ink-5">
-                    <Button
-                      size="sm"
-                      onClick={handleAddNote}
-                      loading={addingNote}
-                      disabled={!noteText.trim()}
-                    >
-                      <Send className="w-3.5 h-3.5" />
+                  <div className="flex justify-end border-t border-ink-5 px-3 py-2">
+                    <Button size="sm" onClick={handleAddNote} loading={addingNote} disabled={!noteText.trim()}>
+                      <Send className="h-3.5 w-3.5" />
                       Add Note
                     </Button>
                   </div>
                 </div>
-                {noteError && (
-                  <p className="px-3 pb-2 text-xs font-mono text-danger">{noteError}</p>
-                )}
+                {noteError && <p className="px-3 pb-2 text-xs font-mono text-danger">{noteError}</p>}
 
-                {/* Notes list */}
                 <div className="space-y-2.5">
                   {(localProspect.notes ?? []).length === 0 ? (
-                    <p className="text-xs text-ink-5 font-mono text-center py-4">No notes yet</p>
+                    <p className="py-4 text-center font-mono text-xs text-ink-5">No notes yet</p>
                   ) : (
                     (localProspect.notes ?? []).map((note) => (
-                      <div key={note.id} className="bg-surface-2 rounded-lg border border-ink-5 p-3">
-                        <p className="text-sm text-ink-2 leading-relaxed whitespace-pre-wrap">{note.content}</p>
-                        <p className="text-[11px] text-ink-5 font-mono mt-2">
-                          {formatDate(note.createdAt)}
-                        </p>
+                      <div key={note.id} className="rounded-lg border border-ink-5 bg-surface-2 p-3">
+                        <p className="whitespace-pre-wrap text-sm leading-relaxed text-ink-2">{note.content}</p>
+                        <p className="mt-2 text-[11px] font-mono text-ink-5">{formatDate(note.createdAt)}</p>
                       </div>
                     ))
                   )}
@@ -309,13 +300,12 @@ export function ProspectDrawer({ open, prospect, canEdit = false, onClose, onUpd
 
 function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className="flex items-center gap-3">
-      <div className="flex items-center gap-2 text-ink-4 w-28 shrink-0">
+    <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
+      <div className="flex items-center gap-2 text-ink-4 sm:w-28 sm:shrink-0">
         {icon}
         <span className="text-xs font-mono">{label}</span>
       </div>
-      <span className="text-sm text-ink-2 truncate">{value}</span>
+      <span className="truncate text-sm text-ink-2">{value}</span>
     </div>
   );
 }
-

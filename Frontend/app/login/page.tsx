@@ -1,4 +1,3 @@
-// app/login/page.tsx
 "use client";
 
 import { useState } from "react";
@@ -28,40 +27,38 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-surface-0 px-4">
+    <div className="flex min-h-dvh items-center justify-center bg-surface-0 px-4 py-8">
       <div className="w-full max-w-md">
-        {/* Logo */}
-        <div className="flex items-center justify-center gap-3 mb-8">
-          <div className="w-10 h-10 bg-brand-500 rounded-xl flex items-center justify-center shadow-glow">
-            <Zap className="w-5 h-5 text-white" />
+        <div className="mb-8 flex items-center justify-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-500 shadow-glow">
+            <Zap className="h-5 w-5 text-white" />
           </div>
           <div>
             <h1 className="text-xl font-bold text-ink-1">EduFlow CRM</h1>
-            <p className="text-[11px] font-mono text-ink-4">Internal System</p>
+            <p className="font-mono text-[11px] text-ink-4">Internal System</p>
           </div>
         </div>
 
-        {/* Card */}
-        <div className="bg-surface-1 border border-ink-5 rounded-2xl p-8 shadow-card">
+        <div className="rounded-2xl border border-ink-5 bg-surface-1 p-6 shadow-card sm:p-8">
           <div className="mb-6">
             <h2 className="text-lg font-semibold text-ink-1">Welcome back</h2>
-            <p className="text-sm text-ink-4 mt-1">Sign in to your account</p>
+            <p className="mt-1 text-sm text-ink-4">Sign in to your account</p>
           </div>
 
           {error && (
-            <div className="flex items-center gap-2 bg-danger-muted border border-danger-border rounded-lg px-4 py-3 mb-5">
-              <AlertCircle className="w-4 h-4 text-danger shrink-0" />
+            <div className="mb-5 flex items-center gap-2 rounded-lg border border-danger-border bg-danger-muted px-4 py-3">
+              <AlertCircle className="h-4 w-4 shrink-0 text-danger" />
               <p className="text-sm text-danger">{error}</p>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-ink-3 uppercase tracking-wider font-mono">
+              <label className="font-mono text-xs font-medium uppercase tracking-wider text-ink-3">
                 Email
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-5 pointer-events-none" />
+                <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-5" />
                 <input
                   id="login-email"
                   type="email"
@@ -69,17 +66,17 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
                   required
-                  className="w-full bg-surface-3 border border-ink-5 rounded-lg pl-10 pr-4 py-2.5 text-sm text-ink-1 placeholder:text-ink-5 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-colors"
+                  className="w-full rounded-lg border border-ink-5 bg-surface-3 py-2.5 pl-10 pr-4 text-sm text-ink-1 placeholder:text-ink-5 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/30"
                 />
               </div>
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-ink-3 uppercase tracking-wider font-mono">
+              <label className="font-mono text-xs font-medium uppercase tracking-wider text-ink-3">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-5 pointer-events-none" />
+                <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-5" />
                 <input
                   id="login-password"
                   type="password"
@@ -88,7 +85,7 @@ export default function LoginPage() {
                   placeholder="••••••••"
                   required
                   minLength={6}
-                  className="w-full bg-surface-3 border border-ink-5 rounded-lg pl-10 pr-4 py-2.5 text-sm text-ink-1 placeholder:text-ink-5 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/30 transition-colors"
+                  className="w-full rounded-lg border border-ink-5 bg-surface-3 py-2.5 pl-10 pr-4 text-sm text-ink-1 placeholder:text-ink-5 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500/30"
                 />
               </div>
             </div>
@@ -97,14 +94,14 @@ export default function LoginPage() {
               id="login-submit"
               type="submit"
               disabled={loading}
-              className="flex items-center justify-center gap-2 bg-brand-500 hover:bg-brand-400 text-white font-medium text-sm py-2.5 rounded-lg transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed mt-2 shadow-sm"
+              className="mt-2 flex items-center justify-center gap-2 rounded-lg bg-brand-500 py-2.5 text-sm font-medium text-white shadow-sm transition-all duration-150 hover:bg-brand-400 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? (
-                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
               ) : (
                 <>
                   Sign In
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="h-4 w-4" />
                 </>
               )}
             </button>
@@ -113,17 +110,14 @@ export default function LoginPage() {
           <div className="mt-6 text-center">
             <p className="text-sm text-ink-4">
               Don&apos;t have an account?{" "}
-              <Link
-                href="/register"
-                className="text-brand-400 hover:text-brand-300 font-medium transition-colors"
-              >
+              <Link href="/register" className="font-medium text-brand-400 transition-colors hover:text-brand-300">
                 Register
               </Link>
             </p>
           </div>
         </div>
 
-        <p className="text-center text-[11px] text-ink-5 font-mono mt-6">
+        <p className="mt-6 text-center font-mono text-[11px] text-ink-5">
           EduFlow CRM · Internal Use Only
         </p>
 
@@ -139,4 +133,3 @@ export default function LoginPage() {
     </div>
   );
 }
-

@@ -56,7 +56,7 @@ export default function SettingsPage() {
   return (
     <>
       <Topbar title="Settings" />
-      <div className="flex-1 overflow-y-auto px-6 py-6">
+      <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6">
         <div className="max-w-3xl mx-auto flex flex-col gap-5">
           <section className="bg-surface-2 border border-ink-5 rounded-xl p-5">
             <h2 className="text-sm font-semibold text-ink-1">Account</h2>
@@ -66,7 +66,7 @@ export default function SettingsPage() {
             ) : !user ? (
               <p className="text-xs font-mono text-danger mt-4">Not signed in</p>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <ReadField label="Name" value={user.name} />
                 <ReadField label="Email" value={user.email} />
                 <ReadField label="Role" value={user.role} />
@@ -148,8 +148,8 @@ function ToggleRow({
   onChange: (value: boolean) => void;
 }) {
   return (
-    <div className="flex items-start justify-between gap-4 bg-surface-3 border border-ink-5 rounded-lg p-3">
-      <div>
+    <div className="flex flex-col gap-3 rounded-lg border border-ink-5 bg-surface-3 p-3 sm:flex-row sm:items-start sm:justify-between">
+      <div className="min-w-0">
         <p className="text-sm text-ink-1 font-medium">{label}</p>
         <p className="text-xs text-ink-4 mt-0.5">{description}</p>
       </div>

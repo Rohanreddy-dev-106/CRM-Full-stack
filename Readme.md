@@ -371,6 +371,7 @@ JWT_SECRET=your-very-long-random-secret-at-least-64-characters
 JWT_EXPIRES_IN=7d
 
 # Email / SMTP Configuration
+# SMTP is the recommended production setup
 EMAIL_FROM=noreply@crm.com
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
@@ -378,7 +379,7 @@ SMTP_SECURE=false
 SMTP_USER=your-email@gmail.com
 SMTP_PASS=your-app-password
 
-# Alternative Simple Gmail credentials (if SMTP not configured)
+# Gmail fallback (only if you cannot use SMTP)
 GMAIL_USER=your-email@gmail.com
 GMAIL_PASS=your-app-password
 

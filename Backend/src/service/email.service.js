@@ -1,9 +1,15 @@
 import nodemailer from "nodemailer";
+import dotenv from "dotenv";
 import { fileURLToPath } from "url";
-import { dirname, join } from "path";
+import { dirname, resolve } from "path";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+dotenv.config({ path: resolve(__dirname, "../../.env") });
+
+let cachedTransporter = null;
+let transporterInitialized = false;
 
 // Configure email transporter based on environment
 const createTransporter = () => {
@@ -47,7 +53,20 @@ const createTransporter = () => {
   return null;
 };
 
-const transporter = createTransporter();
+const getTransporter = () => {
+  if (!transporterInitialized) {
+    cachedTransporter = createTransporter();
+    transporterInitialized = true;
+
+    if (!cachedTransporter) {
+      console.warn(
+        "[Email Service] No email transporter configured. Set SMTP_HOST/SMTP_USER/SMTP_PASS or GMAIL_USER/GMAIL_PASS in Backend/.env"
+      );
+    }
+  }
+
+  return cachedTransporter;
+};
 
 /**
  * Send email with HTML template
@@ -57,14 +76,19 @@ const transporter = createTransporter();
  * @returns {Promise<object>} Email result
  */
 export const sendEmail = async (to, subject, html) => {
+  const transporter = getTransporter();
+
   if (!transporter) {
-    console.warn("[Email Service] No email transporter configured");
-    return { success: false, error: "Email service not configured" };
+    return {
+      success: false,
+      error:
+        "Email service not configured. Add SMTP_HOST/SMTP_USER/SMTP_PASS or GMAIL_USER/GMAIL_PASS to Backend/.env, then restart the backend.",
+    };
   }
 
   try {
     const result = await transporter.sendMail({
-      from: process.env.EMAIL_FROM || process.env.GMAIL_USER || "noreply@crm.com",
+      from: process.env.EMAIL_FROM || process.env.SMTP_FROM || process.env.GMAIL_USER || "noreply@crm.com",
       to,
       subject,
       html,
@@ -222,4 +246,15 @@ export const sendProspectOverdueReminderEmail = async (prospectEmail, prospect) 
   );
 };
 
-export default { sendEmail, sendOverdueNotificationEmail, sendProspectOverdueReminderEmail };
+export const refreshEmailTransporter = () => {
+  transporterInitialized = false;
+  cachedTransporter = null;
+  return getTransporter();
+};
+
+export default {
+  sendEmail,
+  sendOverdueNotificationEmail,
+  sendProspectOverdueReminderEmail,
+  refreshEmailTransporter,
+};

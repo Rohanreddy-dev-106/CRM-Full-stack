@@ -9,16 +9,13 @@ import {
   Check,
   GraduationCap,
   KanbanSquare,
-  LayoutDashboard,
   Link2,
   ListTodo,
-  Minus,
   NotebookText,
   Search,
   ShieldCheck,
   Sparkles,
   UserRound,
-  UsersRound,
   WandSparkles,
 } from "lucide-react";
 import { motion, useReducedMotion, useInView, type Variants } from "framer-motion";
@@ -30,8 +27,6 @@ const navLinks = [
   { label: "Pipeline", href: "#pipeline" },
   { label: "Features", href: "#features" },
   { label: "Automation", href: "#automation" },
-  { label: "Roles", href: "#roles" },
-  { label: "Stack", href: "#stack" },
 ];
 
 const pipelineSteps = [
@@ -146,57 +141,78 @@ const overdueProspects = [
   },
 ];
 
-const roleRows = [
-  "View all prospects",
-  "Create & edit prospects",
-  "Move cards on the board",
-  "Add & view notes",
-  "Update onboarding checklist",
-  "View analytics",
-  "Manage users & roles",
-  "Trigger a manual alert check",
+const kanbanColumns = [
+  {
+    title: "Contacted",
+    count: "04",
+    tone: "from-[#eef7f6] via-[#f7fbfa] to-[#f8fbfc]",
+    accent: "bg-[#0a8aa8]",
+    ring: "border-[#b8ddd9]",
+    cards: [
+      {
+        title: "Northwind Academy",
+        note: "Follow-up check synced",
+        status: "DUE TODAY",
+        badge: "text-[#0a8aa8]",
+      },
+      {
+        title: "Harborview School",
+        note: "Needs a short call recap",
+        status: "OVERDUE",
+        badge: "text-[#9b6230]",
+      },
+    ],
+  },
+  {
+    title: "Demo Done",
+    count: "03",
+    tone: "from-[#fbf6ee] via-[#fffaf4] to-[#fdfbf7]",
+    accent: "bg-[#8b6f4d]",
+    ring: "border-[#e0cfb6]",
+    cards: [
+      {
+        title: "Cedar Grove School",
+        note: "Follow-up check synced",
+        status: "COMPLETE",
+        badge: "text-[#2b6f63]",
+      },
+      {
+        title: "Summit Charter",
+        note: "Waiting on stakeholder notes",
+        status: "DUE TODAY",
+        badge: "text-[#0a8aa8]",
+      },
+    ],
+  },
+  {
+    title: "Pilot Closed",
+    count: "02",
+    tone: "from-[#eef3eb] via-[#f8fbf3] to-[#fafdf7]",
+    accent: "bg-[#2b6f63]",
+    ring: "border-[#d9e5d6]",
+    cards: [
+      {
+        title: "Juniper Hill Prep",
+        note: "Follow-up check synced",
+        status: "COMPLETE",
+        badge: "text-[#0d6b5a]",
+      },
+      {
+        title: "Riverbend Academy",
+        note: "Contract and kickoff aligned",
+        status: "COMPLETE",
+        badge: "text-[#2b6f63]",
+      },
+    ],
+  },
 ];
 
-const roleMatrix: Record<string, boolean[]> = {
-  "View all prospects": [true, true, true],
-  "Create & edit prospects": [true, true, true],
-  "Move cards on the board": [true, true, true],
-  "Add & view notes": [true, true, true],
-  "Update onboarding checklist": [true, true, true],
-  "View analytics": [true, true, true],
-  "Manage users & roles": [true, true, false],
-  "Trigger a manual alert check": [true, true, false],
-};
 
 const kpis = [
   { value: 128, label: "Total prospects", trend: "+18% this month" },
   { value: 34, label: "Conversion rate", trend: "+4 pts vs last month", suffix: "%" },
   { value: 7, label: "Overdue follow-ups", trend: "-5 from last week" },
   { value: 12, label: "Closed this month", trend: "+3 active pilots" },
-];
-
-const frontendStack = [
-  "Next.js 14",
-  "TypeScript",
-  "Tailwind CSS",
-  "App Router",
-  "@hello-pangea/dnd",
-  "lucide-react",
-  "date-fns",
-  "Vitest",
-];
-
-const backendStack = [
-  "Node.js",
-  "Express 5",
-  "Prisma ORM",
-  "MySQL / MariaDB",
-  "JWT auth",
-  "bcrypt",
-  "Zod",
-  "node-cron",
-  "Nodemailer",
-  "Sentry",
 ];
 
 const sectionVariants: Variants = {
@@ -287,18 +303,6 @@ function CountUp({
   );
 }
 
-function PermissionCell({ allowed }: { allowed: boolean }) {
-  return allowed ? (
-    <span className="inline-flex items-center justify-center text-[#0a8aa8] dark:text-cyan-300">
-      <Check className="h-4 w-4" strokeWidth={2.5} />
-    </span>
-  ) : (
-    <span className="inline-flex items-center justify-center text-[#9a8f80] dark:text-slate-500">
-      <Minus className="h-4 w-4" strokeWidth={2.5} />
-    </span>
-  );
-}
-
 export function EduFlowLandingPage() {
   const reduceMotion = useReducedMotion();
 
@@ -327,9 +331,7 @@ export function EduFlowLandingPage() {
                 <span className="block font-display text-xl tracking-tight text-[#1f1812] dark:text-[#f5f7fb]">
                   EduFlow CRM
                 </span>
-                <span className="block text-[11px] uppercase tracking-[0.28em] text-[#6b5d4d] dark:text-slate-400">
-                  School sales, elegantly run
-                </span>
+                
               </span>
             </Link>
 
@@ -446,85 +448,93 @@ export function EduFlowLandingPage() {
                   ? undefined
                   : { duration: 7, repeat: Infinity, ease: "easeInOut" }
               }
-              className="relative rounded-[2rem] border border-[#d9c9b0] bg-[#fffaf2]/95 p-4 shadow-[0_28px_80px_rgba(72,54,32,0.14)] backdrop-blur-sm transition-colors duration-300 dark:border-white/10 dark:bg-[#0f1218]/95 dark:shadow-[0_28px_80px_rgba(0,0,0,0.35)] sm:p-5"
+              className="relative overflow-hidden rounded-[2rem] border border-[#d9c9b0] bg-[#fffaf2]/95 p-4 shadow-[0_28px_80px_rgba(72,54,32,0.14)] backdrop-blur-sm transition-colors duration-300 dark:border-white/10 dark:bg-[#0f1218]/95 dark:shadow-[0_28px_80px_rgba(0,0,0,0.35)] sm:p-5 lg:p-6"
             >
-              <div className="flex items-center justify-between border-b border-[#eadfce] pb-4 dark:border-white/10">
-                <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#7c6b58] dark:text-slate-400">
-                    Live preview
-                  </p>
-                  <h2 className="mt-2 font-display text-2xl tracking-tight text-[#1f1812] dark:text-[#f5f7fb]">
-                    Kanban board preview
-                  </h2>
+              <div className="absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,rgba(10,138,168,0.95),rgba(43,111,99,0.8),rgba(155,98,48,0.75))]" />
+
+              <div className="border-b border-[#eadfce] pb-4 dark:border-white/10 sm:pb-5">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#7c6b58] dark:text-slate-400">
+                      Live preview
+                    </p>
+                    <h2 className="mt-2 font-display text-[clamp(1.7rem,3vw,2.45rem)] leading-[0.98] tracking-tight text-[#1f1812] dark:text-[#f5f7fb]">
+                      Kanban board preview
+                    </h2>
+                    <p className="mt-2 max-w-xl text-sm leading-7 text-[#6a5a49] dark:text-slate-400 sm:text-[0.95rem]">
+                      A compact snapshot of the pipeline with stage summaries, status tags, and quick signals.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 sm:justify-end">
+                    <div className="rounded-full border border-[#cfe8e5] bg-[#e8f6f4] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#0a8aa8] dark:border-cyan-500/20 dark:bg-cyan-500/10 dark:text-cyan-300">
+                      3 columns
+                    </div>
+                    <div className="rounded-full border border-[#e5dacb] bg-[#fffdf8] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#7a6a59] dark:border-white/10 dark:bg-white/5 dark:text-slate-400">
+                      Synced live
+                    </div>
+                  </div>
                 </div>
-                <div className="rounded-full border border-[#cfe8e5] bg-[#e8f6f4] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#0a8aa8] dark:border-cyan-500/20 dark:bg-cyan-500/10 dark:text-cyan-300">
-                  3 columns
+
+                <div className="mt-4 grid gap-2 sm:grid-cols-3">
+                  {[
+                    ["12", "Prospects moving"],
+                    ["3", "Active stages"],
+                    ["9 AM", "Auto checks"],
+                  ].map(([value, label]) => (
+                    <div
+                      key={label}
+                      className="rounded-2xl border border-[#eadfce] bg-[#fffdf8] px-3 py-2.5 text-left dark:border-white/10 dark:bg-white/5"
+                    >
+                      <p className="text-lg font-semibold text-[#1f1812] dark:text-[#f5f7fb]">{value}</p>
+                      <p className="mt-1 text-xs text-[#7a6a59] dark:text-slate-400">{label}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              <div className="mt-5 grid gap-3 md:grid-cols-3">
-                {[
-                  {
-                    title: "Contacted",
-                    tone: "bg-[#eef7f6]",
-                    count: "04",
-                    cards: [
-                      { title: "Northwind Academy", due: "DUE TODAY", accent: "text-[#0a8aa8]" },
-                      { title: "Harborview School", due: "OVERDUE", accent: "text-[#9b6230]" },
-                    ],
-                  },
-                  {
-                    title: "Demo Done",
-                    tone: "bg-[#f7f3ec]",
-                    count: "03",
-                    cards: [
-                      { title: "Cedar Grove School", due: "COMPLETE", accent: "text-[#2b6f63]" },
-                      { title: "Summit Charter", due: "DUE TODAY", accent: "text-[#0a8aa8]" },
-                    ],
-                  },
-                  {
-                    title: "Pilot Closed",
-                    tone: "bg-[#eef2ea]",
-                    count: "02",
-                    cards: [
-                      { title: "Juniper Hill Prep", due: "COMPLETE", accent: "text-[#0d6b5a]" },
-                      { title: "Riverbend Academy", due: "COMPLETE", accent: "text-[#2b6f63]" },
-                    ],
-                  },
-                ].map((column) => (
+              <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {kanbanColumns.map((column) => (
                   <div
                     key={column.title}
                     className={cn(
-                      "rounded-[1.4rem] border border-[#e4d7c3] p-3 shadow-[0_10px_24px_rgba(72,54,32,0.05)] transition-colors duration-300 dark:border-white/10 dark:shadow-[0_10px_24px_rgba(0,0,0,0.16)]",
-                      column.tone
+                      "min-w-0 rounded-[1.6rem] border p-4 shadow-[0_10px_24px_rgba(72,54,32,0.05)] transition-all duration-300 hover:-translate-y-0.5 dark:shadow-[0_10px_24px_rgba(0,0,0,0.16)]",
+                      column.ring,
+                      `bg-gradient-to-br ${column.tone}`
                     )}
                   >
-                    <div className="flex items-center justify-between border-b border-[#e4d7c3] pb-3 dark:border-white/10">
-                      <div>
-                        <p className="font-medium text-[#2d2318] dark:text-[#f5f7fb]">{column.title}</p>
+                    <div className="flex items-start justify-between gap-3 border-b border-[#e4d7c3] pb-3 dark:border-white/10">
+                      <div className="min-w-0 pr-2">
+                        <p className="break-words text-base font-semibold text-[#2d2318] dark:text-[#f5f7fb]">
+                          {column.title}
+                        </p>
                         <p className="text-xs text-[#7a6a59] dark:text-slate-400">{column.count} prospects</p>
                       </div>
-                      <span className="h-2.5 w-2.5 rounded-full bg-[#0a8aa8]" />
+                      <span className={cn("mt-1 h-2.5 w-2.5 rounded-full", column.accent)} />
                     </div>
 
                     <div className="mt-3 space-y-2">
                       {column.cards.map((card) => (
                         <div
                           key={card.title}
-                          className="rounded-2xl border border-[#e5dacb] bg-[#fffdf8] p-3 shadow-[0_8px_18px_rgba(72,54,32,0.05)] transition-colors duration-300 dark:border-white/10 dark:bg-white/5 dark:shadow-[0_8px_18px_rgba(0,0,0,0.18)]"
+                          className="min-w-0 rounded-[1.15rem] border border-[#e5dacb] bg-[#fffdf8]/92 p-3 shadow-[0_8px_18px_rgba(72,54,32,0.05)] transition-all duration-200 hover:-translate-y-0.5 dark:border-white/10 dark:bg-white/5 dark:shadow-[0_8px_18px_rgba(0,0,0,0.18)]"
                         >
-                          <div className="flex items-start justify-between gap-3">
-                            <div>
-                              <p className="text-sm font-semibold text-[#1f1812] dark:text-[#f5f7fb]">{card.title}</p>
-                              <p className="mt-1 text-xs text-[#7a6a59] dark:text-slate-400">Follow-up check synced</p>
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
+                            <div className="min-w-0 flex-1 pr-0 sm:pr-2">
+                              <p className="text-sm font-semibold leading-tight text-[#1f1812] dark:text-[#f5f7fb] sm:text-[0.95rem]">
+                                {card.title}
+                              </p>
+                              <p className="mt-1 text-xs leading-snug text-[#7a6a59] dark:text-slate-400">
+                                {card.note}
+                              </p>
                             </div>
                             <span
                               className={cn(
-                                "rounded-full border border-current/20 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.22em]",
-                                card.accent
+                                "self-start shrink-0 rounded-full border border-current/20 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] sm:mt-0 sm:text-[10px] sm:tracking-[0.22em]",
+                                card.badge
                               )}
                             >
-                              {card.due}
+                              {card.status}
                             </span>
                           </div>
                         </div>
@@ -534,20 +544,20 @@ export function EduFlowLandingPage() {
                 ))}
               </div>
 
-              <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                {[ 
+              <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                {[
                   ["DUE TODAY", "2 schools need follow-up"],
                   ["OVERDUE", "1 account is past SLA"],
                   ["COMPLETE", "3 tasks closed this morning"],
                 ].map(([tag, text]) => (
                   <div
                     key={tag}
-                    className="rounded-2xl border border-[#e4d7c3] bg-[#fffaf2] p-3 transition-colors duration-300 dark:border-white/10 dark:bg-white/5"
+                    className="min-w-0 rounded-2xl border border-[#e4d7c3] bg-[#fffaf2] p-3 transition-all duration-300 hover:-translate-y-0.5 dark:border-white/10 dark:bg-white/5"
                   >
                     <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#0a8aa8] dark:text-cyan-300">
                       {tag}
                     </p>
-                    <p className="mt-2 text-sm text-[#5f5142] dark:text-slate-300">{text}</p>
+                    <p className="mt-2 text-sm leading-snug text-[#5f5142] dark:text-slate-300">{text}</p>
                   </div>
                 ))}
               </div>
@@ -725,48 +735,6 @@ export function EduFlowLandingPage() {
         </motion.section>
 
         <motion.section
-          id="roles"
-          variants={sectionVariants}
-          initial={reduceMotion ? false : "hidden"}
-          whileInView={reduceMotion ? undefined : "show"}
-          viewport={{ once: true, amount: 0.18 }}
-          className="py-16 lg:py-20"
-        >
-          <SectionHeading
-            eyebrow="ROLES"
-            title="A clean comparison table for Admin, Manager, and Agent."
-            description="Permissions stay obvious at a glance, so the team can work quickly without losing control of the data or the process."
-          />
-
-          <div className="mt-10 overflow-hidden rounded-[1.75rem] border border-[#ded2bf] bg-[#fbf7ef] shadow-[0_16px_42px_rgba(72,54,32,0.08)] transition-colors duration-300 dark:border-white/10 dark:bg-white/5 dark:shadow-[0_16px_42px_rgba(0,0,0,0.22)]">
-            <div className="overflow-x-auto">
-              <table className="min-w-[720px] w-full border-collapse text-left">
-                <thead>
-                  <tr className="border-b border-[#e5d8c4] bg-[#f6f0e4] dark:border-white/10 dark:bg-white/5">
-                    <th className="px-5 py-4 text-sm font-semibold text-[#1f1812] dark:text-[#f5f7fb]">Permission</th>
-                    <th className="px-5 py-4 text-sm font-semibold text-[#1f1812] dark:text-[#f5f7fb]">Admin</th>
-                    <th className="px-5 py-4 text-sm font-semibold text-[#1f1812] dark:text-[#f5f7fb]">Manager</th>
-                    <th className="px-5 py-4 text-sm font-semibold text-[#1f1812] dark:text-[#f5f7fb]">Agent</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {roleRows.map((row) => (
-                    <tr key={row} className="border-b border-[#eadfce] last:border-b-0 dark:border-white/10">
-                      <td className="px-5 py-4 text-sm font-medium text-[#2e2419] dark:text-slate-200">{row}</td>
-                      {roleMatrix[row].map((allowed, index) => (
-                        <td key={`${row}-${index}`} className="px-5 py-4">
-                          <PermissionCell allowed={allowed} />
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </motion.section>
-
-        <motion.section
           variants={sectionVariants}
           initial={reduceMotion ? false : "hidden"}
           whileInView={reduceMotion ? undefined : "show"}
@@ -797,55 +765,6 @@ export function EduFlowLandingPage() {
               </motion.article>
             ))}
           </motion.div>
-        </motion.section>
-
-        <motion.section
-          id="stack"
-          variants={sectionVariants}
-          initial={reduceMotion ? false : "hidden"}
-          whileInView={reduceMotion ? undefined : "show"}
-          viewport={{ once: true, amount: 0.2 }}
-          className="py-16 lg:py-20"
-        >
-          <SectionHeading
-            eyebrow="TECH STACK"
-            title="A modern, decoupled full-stack build."
-            description="The architecture keeps the interface sharp on the frontend while leaving the business logic and automations nicely separated behind the scenes."
-          />
-
-          <div className="mt-10 grid gap-4 lg:grid-cols-2">
-            {[
-              { title: "Frontend", icon: LayoutDashboard, items: frontendStack },
-              { title: "Backend", icon: UsersRound, items: backendStack },
-            ].map((column) => {
-              const Icon = column.icon;
-
-              return (
-                <motion.article
-                  key={column.title}
-                  variants={staggerItem}
-                  className="rounded-[1.75rem] border border-[#ded2bf] bg-[#fbf7ef] p-5 shadow-[0_12px_30px_rgba(72,54,32,0.06)] transition-colors duration-300 dark:border-white/10 dark:bg-white/5 dark:shadow-[0_12px_30px_rgba(0,0,0,0.18)]"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-[#b8ddd9] bg-[#e7f5f3] text-[#0a8aa8] dark:border-cyan-500/20 dark:bg-cyan-500/10 dark:text-cyan-300">
-                      <Icon className="h-5 w-5" />
-                    </span>
-                    <h3 className="text-2xl font-semibold text-[#1f1812] dark:text-[#f5f7fb]">{column.title}</h3>
-                  </div>
-                  <div className="mt-5 flex flex-wrap gap-2">
-                    {column.items.map((item) => (
-                      <span
-                        key={item}
-                        className="rounded-full border border-[#e1d3bf] bg-[#fffaf2] px-3 py-2 text-sm text-[#5f5142] dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
-                      >
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                </motion.article>
-              );
-            })}
-          </div>
         </motion.section>
 
         <motion.section
@@ -893,7 +812,7 @@ export function EduFlowLandingPage() {
           </Link>
 
           <nav className="flex flex-wrap items-center gap-4 text-[#615445] dark:text-slate-400">
-            {["Pipeline", "Features", "Roles", "Stack"].map((label) => (
+            {["Pipeline", "Features", "Automation"].map((label) => (
               <a
                 key={label}
                 href={`#${label.toLowerCase()}`}

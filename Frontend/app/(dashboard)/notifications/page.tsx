@@ -37,10 +37,10 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-4 py-4 sm:px-6 sm:py-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Notifications</h1>
-        <p className="mt-2 text-gray-600">
+        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">Notifications</h1>
+        <p className="mt-2 max-w-2xl text-sm text-gray-600 sm:text-base">
           Stay updated with alerts about overdue prospects and important events
         </p>
       </div>
@@ -60,21 +60,21 @@ export default function NotificationsPage() {
                   !notification.read ? "border-blue-200 bg-blue-50" : "border-gray-200 bg-white"
                 } transition-shadow hover:shadow-md`}
               >
-                <div className="flex items-start gap-4">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
                   <div className={`rounded-lg p-3 text-lg ${color}`}>{label}</div>
 
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between">
-                      <div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0">
                         <h3 className="font-semibold text-gray-900">{title}</h3>
                         <p className="mt-1 text-sm text-gray-600">{message}</p>
                       </div>
                       {!notification.read && (
-                        <span className="ml-2 inline-block h-2 w-2 rounded-full bg-blue-600" />
+                        <span className="h-2 w-2 rounded-full bg-blue-600 sm:ml-2 sm:mt-2" />
                       )}
                     </div>
 
-                    <div className="mt-3 flex items-center justify-between">
+                    <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <p className="text-xs text-gray-500">
                         {new Date(createdAt).toLocaleDateString()} at{" "}
                         {new Date(createdAt).toLocaleTimeString([], {
@@ -113,7 +113,7 @@ export default function NotificationsPage() {
         <div className="rounded-lg border border-gray-200 bg-gray-50 py-12 text-center">
           <div className="mb-4 text-5xl">🎉</div>
           <h2 className="mb-2 text-xl font-semibold text-gray-900">All caught up!</h2>
-          <p className="text-gray-600">
+          <p className="px-4 text-gray-600">
             You have no notifications at the moment. Great job staying organized!
           </p>
         </div>

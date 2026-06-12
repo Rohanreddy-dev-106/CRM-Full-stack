@@ -55,9 +55,9 @@ export function AnalyticsDashboard() {
   const maxCount = Math.max(...stats.stageBreakdown.map((s) => s.count), 1);
 
   return (
-    <div className="p-6 flex flex-col gap-6 max-w-4xl">
+    <div className="flex max-w-4xl flex-col gap-6 p-4 sm:p-6">
       {/* KPI cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard
           icon={<Users className="w-5 h-5" />}
           label="Total Prospects"
@@ -123,7 +123,7 @@ export function AnalyticsDashboard() {
       {/* Funnel hint */}
       <div className="bg-surface-2 rounded-xl border border-ink-5 p-5">
         <h2 className="text-sm font-semibold text-ink-1 mb-3">Funnel Drop-off</h2>
-        <div className="flex items-end gap-3 h-32">
+        <div className="flex h-32 items-end gap-2 sm:gap-3">
           {STAGE_ORDER.map((stage, i) => {
             const s = stats.stageBreakdown.find((x) => x.stage === stage) ?? { count: 0 };
             const config = STAGE_CONFIG[stage];

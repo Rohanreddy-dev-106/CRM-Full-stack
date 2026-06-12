@@ -97,7 +97,17 @@ NODE_ENV=development
 ENABLE_NOTIFICATIONS=true
 ```
 
-In development mode, emails print to console instead of sending.
+For real delivery, add SMTP credentials in `Backend/.env`:
+```bash
+SMTP_HOST=smtp.your-provider.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your-smtp-user
+SMTP_PASS=your-smtp-password
+EMAIL_FROM=noreply@your-domain.com
+```
+
+Development mode still logs to console if SMTP is not configured.
 
 ### **Step 4: Trigger Manual Check**
 
@@ -286,10 +296,12 @@ ORDER BY COUNT(nl.id) DESC;
 **Check:**
 1. Email configuration:
    ```bash
+   echo $SMTP_HOST
+   echo $SMTP_USER
+   echo $SMTP_PASS
+   # OR fallback
    echo $GMAIL_USER
    echo $GMAIL_PASS
-   # OR
-   echo $SMTP_HOST
    ```
 
 2. Development vs Production mode:
